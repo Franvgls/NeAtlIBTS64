@@ -14,3 +14,5 @@ Imports:
     sf
 Suggests: 
     sp
+URL: https://github.com/Franvgls/NeAtlIBTS64
+BugReports: https://github.com/Franvgls/NeAtlIBTS64/issues
