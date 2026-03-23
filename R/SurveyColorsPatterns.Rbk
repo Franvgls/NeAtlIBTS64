@@ -1,0 +1,11 @@
+surveys<-c("UK-SCOSWCGFS","UK-SCOROC","UK-NIGFS","IE-IGFS","SP-PORC","FR-CGFS","FR-WCGFS","FR-EVHOE","SP-NORTH","PT-IBTS","SP-ARSA")
+colores<-c("yellow","navy","darkgreen","green","red","blue","orange","steelblue","brown","salmon","aquamarine")
+cbind(surveys,colores,seq(0,350,by=32))
+
+png("NeAtlIBTS_map_old.png",width = 1500,height = 2200,pointsize = 40)
+NeAtlIBTS::IBTSNeAtl_map()
+dev.off()
+
+png("NeAtlIBTS_map_new.png",width = 1500,height = 2200,pointsize = 40)
+IBTSNeAtl_map()
+dev.off()
