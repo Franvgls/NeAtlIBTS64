@@ -13,6 +13,14 @@ IBTSGantt <- function(summary_df, year = NULL, IBTSsurvs = NULL) {
 
   if (is.null(year)) year <- unique(summary_df$Year)[1]
 
+  # --- Funcion auxiliar: color de texto segun luminancia del fondo ---
+  # Devuelve "black" o "white" segun si el fondo es claro u oscuro
+  txt_col <- function(bg) {
+    rgb <- grDevices::col2rgb(bg) / 255
+    lum <- 0.299 * rgb[1,] + 0.587 * rgb[2,] + 0.114 * rgb[3,]
+    ifelse(lum > 0.45, "black", "white")
+  }
+
   # --- Tabla de colores ---
   extra_cols <- c("NS-IBTS" = "red", "IE-IAMS" = "darkgreen", "NIGFS" = "cyan4")
   if (!is.null(IBTSsurvs)) {
@@ -29,10 +37,11 @@ IBTSGantt <- function(summary_df, year = NULL, IBTSsurvs = NULL) {
   gdf$label      <- paste0(gdf$Survey, " Q", gdf$Quarter)
 
   if (!is.null(IBTSsurvs)) {
-    gdf$bar_color <- ifelse(gdf$Survey %in% names(col_map),
-                            col_map[gdf$Survey], "gray50")
+    # unname() evita que el resultado herede el nombre del vector y cause problemas
+    gdf$bar_color <- unname(ifelse(gdf$Survey %in% names(col_map),
+                                   col_map[gdf$Survey], "gray50"))
   } else {
-    gdf$bar_color <- col_map[as.character(gdf$Quarter)]
+    gdf$bar_color <- unname(col_map[as.character(gdf$Quarter)])
   }
 
   # Ordenar cronologico de arriba (primero) a abajo (ultimo)
@@ -47,8 +56,14 @@ IBTSGantt <- function(summary_df, year = NULL, IBTSsurvs = NULL) {
                     as.Date(paste0(year, "-12-31")), by = "month")
   meses <- meses[meses >= x_min & meses <= x_max]
 
+  # Ancho dinamico del rotulo Y y separacion
+  rango_x <- as.numeric(x_max) - as.numeric(x_min)
+  lbl_w   <- rango_x * 0.13
+  lbl_sep <- rango_x * 0.01
+
   # --- Lienzo ---
-  par(mar = c(4, 10, 3, 2))
+  left_mar <- max(nchar(gdf$label)) * 0.9 + 2
+  par(mar = c(4, left_mar, 3, 2))
   plot(NULL,
        xlim = c(x_min, x_max), ylim = c(0.5, n + 0.5),
        xaxt = "n", yaxt = "n", xlab = "", ylab = "", bty = "n")
@@ -62,41 +77,35 @@ IBTSGantt <- function(summary_df, year = NULL, IBTSsurvs = NULL) {
   # Grid vertical en meses
   abline(v = as.numeric(meses), col = gray(.85), lwd = .5)
 
-  # --- Barras, textos y rotulos Y ---
-  lbl_w <- 12  # ancho del rectangulo de rotulo en dias — ajustar si hace falta
-
-  # Justo antes del bucle, calcular lbl_w dinamicamente
-  rango_x <- as.numeric(x_max) - as.numeric(x_min)
-  lbl_w   <- rango_x * 0.13   # mas ancho
-  lbl_sep  <- rango_x * 0.01  # separacion entre rotulo y borde del plot
-
+  # --- Barras, textos y rotulos Y (UN SOLO bucle) ---
   for (i in seq_len(n)) {
-    for (i in seq_len(n)) {
 
-      # Barra
-      rect(as.numeric(gdf$start_date[i]), i - .35,
-           as.numeric(gdf$end_date[i]),   i + .35,
-           col = gdf$bar_color[i], border = NA)
+    bc <- gdf$bar_color[i]   # color de fondo de esta fila
+    tc <- txt_col(bc)        # "black" o "white" segun luminancia
 
-      # Texto interior: validos/totales
-      mid <- as.numeric(gdf$start_date[i]) +
-        (as.numeric(gdf$end_date[i]) - as.numeric(gdf$start_date[i])) / 2
-      text(mid, i, paste0(gdf$N_valid[i], "/", gdf$N_hauls[i]),
-           col = "white", cex = .7, font = 2)
+    # Barra
+    rect(as.numeric(gdf$start_date[i]), i - .35,
+         as.numeric(gdf$end_date[i]),   i + .35,
+         col = bc, border = NA)
 
-      # Fechas fuera de la barra
-      text(as.numeric(gdf$start_date[i]), i, gdf$Start[i], pos = 2, cex = .65, font = 2)
-      text(as.numeric(gdf$end_date[i]),   i, gdf$End[i],   pos = 4, cex = .65, font = 2)
+    # Texto interior: validos/totales — color adaptado a luminancia
+    mid <- as.numeric(gdf$start_date[i]) +
+      (as.numeric(gdf$end_date[i]) - as.numeric(gdf$start_date[i])) / 2
+    text(mid, i, paste0(gdf$N_valid[i], "/", gdf$N_hauls[i]),
+         col = tc, cex = .7, font = 2)
 
-      # Rotulo eje Y — UN SOLO text(), justificado a la izquierda
-      rect_izq <- as.numeric(x_min) - lbl_w - lbl_sep
-      rect_der <- as.numeric(x_min) - lbl_sep
-      rect(rect_izq, i - .35, rect_der, i + .35,
-           col = gdf$bar_color[i], border = NA, xpd = TRUE)
-      text(rect_izq + rango_x * 0.005, i, gdf$label[i],
-           adj = c(0, 0.5), cex = .75, font = 2, col = "white", xpd = TRUE)
-      }
-    }
+    # Fechas fuera de la barra
+    text(as.numeric(gdf$start_date[i]), i, gdf$Start[i], pos = 2, cex = .65, font = 2)
+    text(as.numeric(gdf$end_date[i]),   i, gdf$End[i],   pos = 4, cex = .65, font = 2)
+
+    # Rotulo eje Y — rectangulo del color de la campana, texto adaptado
+    rect_izq <- as.numeric(x_min) - lbl_w - lbl_sep
+    rect_der <- as.numeric(x_min) - lbl_sep
+    rect(rect_izq, i - .35, rect_der, i + .35,
+         col = bc, border = NA, xpd = TRUE)
+    text(rect_izq + rango_x * 0.005, i, gdf$label[i],
+         adj = c(0, 0.5), cex = .75, font = 2, col = tc, xpd = TRUE)
+  }
 
   # --- Ejes y titulo ---
   axis(1, at = as.numeric(meses), labels = format(meses, "%b"), cex.axis = .8)

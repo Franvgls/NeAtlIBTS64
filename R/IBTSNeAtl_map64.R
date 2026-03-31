@@ -24,6 +24,8 @@
 #' @param ICESlabcex size of ICES rectangle labels in cex (default 0.8)
 #' @param NS if TRUE adds the North Sea ICES rectangle grid (default FALSE)
 #' @param bathy if TRUE plots the isobaths (default TRUE)
+#' @param bathy_col colour for isobath lines (default "gray55")
+#' @param bathy_lwd line width for isobath lines (default 0.4)
 #' @param bw if TRUE land in grey, if FALSE in burlywood3 (default FALSE)
 #' @param bords if TRUE plots country borders (default TRUE)
 #' @param axlab size of axis labels (default 0.8)
@@ -47,7 +49,8 @@ IBTSNeAtl_map64 <- function(nl = 60.5, sl = 36.0, xlims = c(-18, 3),
                           dens = 30, load = TRUE,
                           ICESdiv = TRUE, ICESrect = FALSE,
                           ICESlab = FALSE, ICESlabcex = 0.8,
-                          NS = FALSE, bathy = TRUE, bw = FALSE,
+                          NS = FALSE, bathy = TRUE, bathy_col = "gray55", bathy_lwd = 0.4,
+                          bw = FALSE,
                           bords = TRUE, axlab = 0.8, lwdl = 0.1,
                           shpdir = system.file("shapes", package = "NeAtlIBTS64"),
                           places = FALSE, minpop = 200000,
@@ -150,10 +153,10 @@ IBTSNeAtl_map64 <- function(nl = 60.5, sl = 36.0, xlims = c(-18, 3),
   if (!bw) rect(usr[1], usr[3], usr[2], usr[4], col = "lightblue1", border = NA)
   clip(usr[1], usr[2], usr[3], usr[4])
 
-    # Batimetria
   if (bathy) {
-    sp::plot(bath100_sp[1],    add = TRUE, col = ifelse(bw, gray(.85), gray(.70)), lwd = .1)
-    sp::plot(bathy_geb_sp[1],  add = TRUE, col = ifelse(bw, gray(.85), gray(.65)), lwd = .1)
+    bc <- if (bw) gray(.85) else bathy_col
+    sp::plot(bath100_sp[1],   add = TRUE, col = bc, lwd = bathy_lwd)
+    sp::plot(bathy_geb_sp[1], add = TRUE, col = bc, lwd = bathy_lwd)
   }
 
   # Divisiones ICES

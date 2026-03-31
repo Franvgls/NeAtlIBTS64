@@ -19,13 +19,15 @@ IBTSNeAtl_map64(
   ICESlabcex = 0.8,
   NS = FALSE,
   bathy = TRUE,
+  bathy_col = "gray55",
+  bathy_lwd = 0.4,
   bw = FALSE,
   bords = TRUE,
   axlab = 0.8,
   lwdl = 0.1,
-  shpdir = "c:/GitHubRs/shapes/",
+  shpdir = system.file("shapes", package = "NeAtlIBTS64"),
   places = FALSE,
-  minpop = 2e+05,
+  minpop = 200000,
   newdev = TRUE,
   graf = FALSE,
   xpng = 1200,
@@ -61,6 +63,10 @@ IBTSNeAtl_map64(
 \item{NS}{if TRUE adds the North Sea ICES rectangle grid (default FALSE)}
 
 \item{bathy}{if TRUE plots the isobaths (default TRUE)}
+
+\item{bathy_col}{colour for isobath lines (default "gray55")}
+
+\item{bathy_lwd}{line width for isobath lines (default 0.4)}
 
 \item{bw}{if TRUE land in grey, if FALSE in burlywood3 (default FALSE)}
 
