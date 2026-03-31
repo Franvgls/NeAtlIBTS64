@@ -1,6 +1,6 @@
 Package: NeAtlIBTS64
 Title: Scritps and functions for the IBTSNeAtl in 64bits (One Line, Title Case)
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: 
     person("Fran", "Velasco", , "Franvgls@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
