@@ -22,10 +22,6 @@
 #' @param NS Logical. If TRUE (default) includes North Sea (wider xlim).
 #' @param noutliers Integer. Number of top-value hauls to treat as outliers
 #'   (drawn as open circles with a "> N" label). Default 5.
-#' @param outlier_min_max Numeric. Minimum value of the non-zero maximum (mxd)
-#'   required to activate outlier detection. If mxd < outlier_min_max outliers
-#'   are disabled regardless of noutliers (all points drawn at real scale).
-#'   Default 20.
 #' @param scaler Numeric. Bubble-size divisor. Increase to shrink all bubbles.
 #'   Default 0.35 (same as legacy MapIBTS).
 #' @param sl Numeric. Southern latitude limit (degrees N). Default 35.
@@ -98,8 +94,7 @@ MapIBTS64 <- function(data,
                        heading     = NULL,
                        dato        = 1,
                        NS          = TRUE,
-                       noutliers        = 5,
-                       outlier_min_max  = 20,
+                       noutliers   = 5,
                        scaler      = 0.35,
                        sl          = 35,
                        nl          = 61.5,
@@ -217,22 +212,10 @@ MapIBTS64 <- function(data,
 
   # ---- 6. Identify positive hauls and outliers ----------------------------
   df_pos  <- df[df[, dato_col] > 0, ]
-
-  # Caso sin capturas positivas en este grupo (ej. todos Group1 = 0)
-  no_catch <- !stations && nrow(df_pos) == 0
-  if (no_catch) {
-    warning(paste0("No positive catches found for '", dato_col, "' (",
-                   esp_n, "). Plotting zero-catch stations only."))
-    mxd <- 0
-    ml  <- 5; m <- 5
-  } else {
-    mxd <- max(df_pos[, dato_col], na.rm = TRUE)
-  }
-
+  mxd     <- max(df_pos[, dato_col], na.rm = TRUE)
   pout    <- integer(0)
   OUTLIERS <- numeric(0)
-  outliers <- (!stations) && !no_catch && (nrow(df_pos) > noutliers) && (noutliers > 0) &&
-             (mxd >= outlier_min_max)
+  outliers <- (!stations) && (nrow(df_pos) > noutliers) && (noutliers > 0)
 
   if (outliers) {
     threshold <- sort(df_pos[, dato_col])[nrow(df_pos) - noutliers]
@@ -260,7 +243,7 @@ MapIBTS64 <- function(data,
     }
   }
 
-  if (!outliers && !no_catch) {
+  if (!outliers) {
     m <- trunc(mxd)
     if ((signif(m, 1) / (10^nchar(m))) > 0.25) {
       ml <- 5 * 10^(nchar(m) - 1)
@@ -298,18 +281,17 @@ MapIBTS64 <- function(data,
   if (!add) {
     # IBTSNeAtl_map64 draws worldHires + shapefiles + grid + ICES lines + land fill
     # load=FALSE skips the campana polygons; leg=FALSE omits survey legend
-    IBTSNeAtl_map64(
+    do.call(IBTSNeAtl_map64, c(list(
       load      = FALSE,
       leg       = FALSE,
       newdev    = newdev,
       NS        = NS,
-      sl        = sl,
-      nl        = nl,
+      ylims     = c(sl, nl),
       bathy     = TRUE,
       bathy_col = bathy_col,
       bathy_lwd = bathy_lwd,
       graf      = FALSE
-    )
+    )))
   }
 
   # ---- 9. Plot CPUE bubbles -----------------------------------------------
@@ -318,32 +300,23 @@ MapIBTS64 <- function(data,
   # ya que los no-outliers tienen CPUE <= ml por definicion.
   denom <- ml * scaler_use
 
-  if (no_catch) {
-    # Sin capturas en este grupo: pintar todas las posiciones como circulos vacios
+  # Non-outlier filled circles
+  df_plot <- if (outliers && length(pout) > 0) df_pos[-pout, ] else df_pos
+  if (nrow(df_plot) > 0) {
     graphics::points(
-      df$Longitude, df$Latitude,
-      cex = 0.6, pch = 1,
-      col = df$bgs, lwd = 0.6
+      df_plot$Longitude, df_plot$Latitude,
+      cex = sqrt(df_plot[, dato_col] / denom),
+      pch = 21, bg = df_plot$bgs, lwd = 0.5
     )
-  } else {
-    # Non-outlier filled circles
-    df_plot <- if (outliers && length(pout) > 0) df_pos[-pout, ] else df_pos
-    if (nrow(df_plot) > 0) {
-      graphics::points(
-        df_plot$Longitude, df_plot$Latitude,
-        cex = sqrt(df_plot[, dato_col] / denom),
-        pch = 21, bg = df_plot$bgs, lwd = 0.5
-      )
-    }
+  }
 
-    # Outliers: open circles fijos al tamano maximo (sqrt(ml/denom) = sqrt(1/scaler_use))
-    if (outliers && length(pout) > 0) {
-      graphics::points(
-        df_pos[pout, "Longitude"], df_pos[pout, "Latitude"],
-        cex = sqrt(ml / denom),
-        pch = 21, col = df_pos$bgs[pout], bg = NA, lwd = 2
-      )
-    }
+  # Outliers: open circles fijos al tamano maximo (sqrt(ml/denom) = sqrt(1/scaler_use))
+  if (outliers && length(pout) > 0) {
+    graphics::points(
+      df_pos[pout, "Longitude"], df_pos[pout, "Latitude"],
+      cex = sqrt(ml / denom),
+      pch = 21, col = df_pos$bgs[pout], bg = NA, lwd = 2
+    )
   }
 
   # ---- 10. Legend ---------------------------------------------------------
@@ -352,14 +325,7 @@ MapIBTS64 <- function(data,
     pts          <- length(surv_in_data)
     leg_colors   <- unname(col_map[surv_in_data])
 
-    if (no_catch) {
-      # Sin capturas: leyenda de tamano vacia, solo nota y surveys
-      l1      <- "No catch recorded"
-      pt.size <- 0.6
-      pt.simb <- 1
-      pt.col  <- "gray50"
-      pt.lwd  <- 0.6
-    } else if (!stations) {
+    if (!stations) {
       # Size-scale part of the legend — mismo denominador denom = ml * scaler_use
       l1      <- trunc(ml * c(0.1, 0.3, 0.5, 1))
       pt.size <- sqrt(l1 / denom)

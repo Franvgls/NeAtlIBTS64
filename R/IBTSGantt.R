@@ -59,7 +59,7 @@ IBTSGantt <- function(summary_df, year = NULL, IBTSsurvs = NULL) {
   # Ancho dinamico del rotulo Y y separacion
   rango_x <- as.numeric(x_max) - as.numeric(x_min)
   lbl_w   <- rango_x * 0.13
-  lbl_sep <- rango_x * 0.01
+  lbl_sep <- rango_x * 0.05
 
   # --- Lienzo ---
   left_mar <- max(nchar(gdf$label)) * 0.9 + 2

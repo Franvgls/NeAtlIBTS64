@@ -36,10 +36,11 @@ IBTSPositMap <- function(ibts_data, year = NULL,
 
   # Mapa base
   if (!add) {
+    if (!no_NS) {xlims=c(-13,14)}
     IBTSNeAtl_map64(load = FALSE, leg = FALSE, ...)
     title(paste("IBTSWG NeAtl", year,
                 if (!is.null(quarters)) paste0("Q", paste(quarters, collapse="+"))),
-          font.main = 2)
+          font.main = 2,line = 2)
   }
 
   # Pintar lances

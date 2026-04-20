@@ -10,9 +10,11 @@
 #' cosine correction at the mean latitude, so the map is always geographically
 #' correct regardless of the limits used.
 #'
-#' @param nl northernmost limit of the map (default 60.5)
-#' @param sl southernmost limit of the map (default 36.0)
-#' @param xlims longitude limits as c(west, east) (default c(-18, 3))
+#' @param xlims longitude limits as c(west, east). NULL (default) uses c(-18,3)
+#'   when NS=FALSE and c(-18,11) when NS=TRUE. User-supplied values always take precedence.
+#' @param ylims latitude limits as c(south, north). NULL (default) uses c(36,60.5)
+#'   when NS=FALSE and c(36,62) when NS=TRUE. User-supplied values always take precedence.
+#'   Replaces the legacy nl/sl parameters.
 #' @param leg if TRUE includes the legend (default TRUE)
 #' @param legpos position of the legend (default "bottomright")
 #' @param cex.leg size of the legend text (default 0.9)
@@ -24,8 +26,6 @@
 #' @param ICESlabcex size of ICES rectangle labels in cex (default 0.8)
 #' @param NS if TRUE adds the North Sea ICES rectangle grid (default FALSE)
 #' @param bathy if TRUE plots the isobaths (default TRUE)
-#' @param bathy_col colour for isobath lines (default "gray55")
-#' @param bathy_lwd line width for isobath lines (default 0.4)
 #' @param bw if TRUE land in grey, if FALSE in burlywood3 (default FALSE)
 #' @param bords if TRUE plots country borders (default TRUE)
 #' @param axlab size of axis labels (default 0.8)
@@ -44,7 +44,7 @@
 #' IBTSNeAtl_map(dens = 0, load = FALSE, ICESrect = TRUE)
 #' }
 #' @export
-IBTSNeAtl_map64 <- function(nl = 60.5, sl = 36.0, xlims = c(-18, 3),
+IBTSNeAtl_map64 <- function(xlims = NULL, ylims = NULL,
                           leg = TRUE, legpos = "bottomright", cex.leg = 0.9,
                           dens = 30, load = TRUE,
                           ICESdiv = TRUE, ICESrect = FALSE,
@@ -56,6 +56,15 @@ IBTSNeAtl_map64 <- function(nl = 60.5, sl = 36.0, xlims = c(-18, 3),
                           places = FALSE, minpop = 200000,
                           newdev = TRUE,
                           graf = FALSE, xpng = 1200, ypng = 800, ppng = 15) {
+
+  # --- Limites por defecto segun NS -------------------------------------------
+  if (is.null(xlims) || all(is.na(xlims)))
+    xlims <- if (NS) c(-18, 13) else c(-18, 3)
+  if (is.null(ylims) || all(is.na(ylims)))
+    ylims <- if (NS) c(36, 62) else c(36, 60.5)
+  sl <- ylims[1]
+  nl <- ylims[2]
+  # ---------------------------------------------------------------------------
 
   # --- Dependencias ---
   stopifnot(requireNamespace("sf",      quietly = TRUE))
@@ -131,7 +140,7 @@ IBTSNeAtl_map64 <- function(nl = 60.5, sl = 36.0, xlims = c(-18, 3),
 
   # --- Lectura de campanas si load=TRUE ---
   if (load) {
-    SWC_Q1_sp  <- to_sp(read_shp("SWC_Q1"))
+   SWC_Q1_sp  <- to_sp(read_shp("SWC_Q1"))
     SCOROC_sp  <- to_sp(read_shp("SCOROC"))
     NIGFS_sp   <- to_sp(read_shp("NI_IBTS"))
     IGFS_sp    <- to_sp(read_shp("IGFS"))
@@ -153,6 +162,7 @@ IBTSNeAtl_map64 <- function(nl = 60.5, sl = 36.0, xlims = c(-18, 3),
   if (!bw) rect(usr[1], usr[3], usr[2], usr[4], col = "lightblue1", border = NA)
   clip(usr[1], usr[2], usr[3], usr[4])
 
+    # Batimetria
   if (bathy) {
     bc <- if (bw) gray(.85) else bathy_col
     sp::plot(bath100_sp[1],   add = TRUE, col = bc, lwd = bathy_lwd)
@@ -167,15 +177,13 @@ IBTSNeAtl_map64 <- function(nl = 60.5, sl = 36.0, xlims = c(-18, 3),
     abline(h = seq(30, 65, by = .5), v = seq(-44, 68, by = 1),
            col = gray(.8), lwd = .2)
 
-  # Cuadricula NS
-  if (NS) {
-    rect(-4, 55.5, 9.5, 60.2, col = "tomato1", border = NA)
-    rect(-2, 50.0, 9.5, 60.2, col = "tomato1", border = NA)
-    for (lat in seq(55, 66, by = .5)) segments(-4, lat, 12, lat, col = gray(.85), lwd = .01)
-    for (lat in seq(49.5, 55, by = .5)) segments(-2, lat, 12, lat, col = gray(.85), lwd = .01)
-    for (lon in seq(-4, 12, by = 1))  segments(lon, 55, lon, 65, col = gray(.85), lwd = .01)
-    for (lon in seq(-2, 12, by = 1))  segments(lon, 50, lon, 55, col = gray(.85), lwd = .01)
-  }
+  # # Cuadricula NS
+  # if (NS) {
+  #   for (lat in seq(55, 66, by = .5)) segments(-4, lat, 12, lat, col = gray(.85), lwd = .01)
+  #   for (lat in seq(49.5, 55, by = .5)) segments(-2, lat, 12, lat, col = gray(.85), lwd = .01)
+  #   for (lon in seq(-4, 12, by = 1))  segments(lon, 55, lon, 65, col = gray(.85), lwd = .01)
+  #   for (lon in seq(-2, 12, by = 1))  segments(lon, 50, lon, 55, col = gray(.85), lwd = .01)
+  # }
 
   # --- Ejes W/E ---
   if (all(xlims < 0)) {
@@ -220,6 +228,14 @@ IBTSNeAtl_map64 <- function(nl = 60.5, sl = 36.0, xlims = c(-18, 3),
 
   # --- Campanas (tramado) ---
   if (load) {
+    if (NS){
+      rect(-4, 55.5, 9.5, 62.0, col = "tomato1", border = NA)
+      rect(-2, 50.0, 9.5, 60.2, col = "tomato1", border = NA)
+      for (lat in seq(55, 66, by = .5)) segments(-4, lat, 12, lat, col = gray(.85), lwd = .01)
+      for (lat in seq(49.5, 55, by = .5)) segments(-2, lat, 12, lat, col = gray(.85), lwd = .01)
+      for (lon in seq(-4, 12, by = 1))  segments(lon, 55, lon, 65, col = gray(.85), lwd = .01)
+      for (lon in seq(-2, 12, by = 1))  segments(lon, 50, lon, 55, col = gray(.85), lwd = .01)
+    }
     sp::plot(SWC_Q1_sp,  add = TRUE, col = "yellow",     lwd = lwdl, density = dens, angle =   0)
     sp::plot(SCOROC_sp,  add = TRUE, col = "yellow4",    lwd = lwdl, density = dens, angle =  32)
     sp::plot(NIGFS_sp,   add = TRUE, col = "cyan4",      lwd = lwdl, density = dens, angle =  64)
@@ -258,7 +274,7 @@ IBTSNeAtl_map64 <- function(nl = 60.5, sl = 36.0, xlims = c(-18, 3),
   if (leg) {
     colores <- c("tomato1","yellow","yellow4","cyan4","green","red",
                  "navy","violet","blue","orange","lightgreen","sienna")
-    if (NS) {
+    if (NS && load) {
       survs <- c("NS-IBTS","SCOWCGFS","SCOROC","NIGFS","IE-IGFS","SP-PORC",
                  "FR-CGFS","FR-WCGFS","EVHOE","SP-NORTH","PT-IBTS","SP-ARSA")
     } else {

@@ -82,7 +82,7 @@ gearPlotHH.dodp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,es=F,col1="da
             else {
               if (es) legend("bottomright",legend=c("Malletas cortas","Malletas largas"),pch=21,col=c(col1,col1),pt.bg=c(col2,col1),inset=.04,bty="n")
               else legend("bottomright",legend=c("Short sweeps","Long sweeps"),pch=21,col=c(col1,col1),pt.bg=c(col2,col1),inset=.04,bty="n")
-              text(0,0, as.character(years),adj=0.01,font=1, cex=.9,pos=4)
+              #text(0,0, as.character(years),adj=0.01,font=1, cex=.9,pos=4)
             }
             if (ti) title(main=paste0(ifelse(es,"Abertura de puertas vs. profunfidad en ","Door Spread vs. Depth in "),dumb$Survey[1],".Q",quarter),line=2.5)
             mtext(dumb$Ship[1],line=.4,cex=.8,adj=0)

@@ -54,6 +54,16 @@
 #'   E.g. \code{c(3, 4)} skips all Q1 surveys.  Default NULL = all quarters.
 #' @param valid_only Logical.  Keep only HaulVal \%in\% c("V","A").
 #'   Default TRUE.
+#' @param local_HL data.frame opcional en formato DATRAS HL con datos locales
+#'   (e.g. especies no subidas aún a DATRAS). Se filtra por \code{Survey} y
+#'   \code{Quarter} y se añade mediante \code{rbind} al HL descargado antes
+#'   de cualquier procesamiento. \code{DataType} se fuerza a \code{"R"}.
+#'   El \code{HaulDur} se tomará del HH existente vía \code{HaulNo}.
+#' @param local_HH data.frame opcional en formato DATRAS HH con datos locales
+#'   (e.g. campanas no subidas aun a DATRAS como PT-IBTS Q4). Debe tener
+#'   columnas \code{Survey} y \code{Quarter} para el filtro por clave.
+#'   Si hay filas para un \code{surv+q}, se usan en vez de descargar HH de
+#'   DATRAS Y se omite el chequeo de disponibilidad en DATRAS para esa clave.
 #' @param HHdata Output of \code{IBTSSurveySummary()} to reuse cached HH data.
 #'   NULL downloads fresh HH from DATRAS for each survey.
 #' @param verbose Logical.  Print progress messages.  Default TRUE.
@@ -91,12 +101,14 @@
 #'
 #' @export
 IBTSGetSpeciesCPUE <- function(year,
-                                species    = NULL,
-                                surveys    = NULL,
-                                quarters   = NULL,
-                                valid_only = TRUE,
-                                HHdata     = NULL,
-                                verbose    = TRUE) {
+                               species    = NULL,
+                               surveys    = NULL,
+                               quarters   = NULL,
+                               valid_only = TRUE,
+                               HHdata     = NULL,
+                               local_HL   = NULL,
+                               local_HH   = NULL,
+                               verbose    = TRUE) {
 
   # ---- 0. Default survey list -----------------------------------------------
   default_surveys <- list(
@@ -104,6 +116,7 @@ IBTSGetSpeciesCPUE <- function(year,
     list(surv = "NS-IBTS",   q = 3),
     list(surv = "SCOWCGFS",  q = 1),
     list(surv = "SCOWCGFS",  q = 4),
+    list(surv = "NIGFS",     q = 1),
     list(surv = "NIGFS",     q = 4),
     list(surv = "IE-IAMS",   q = 1),
     list(surv = "IE-IAMS",   q = 2),
@@ -146,29 +159,70 @@ IBTSGetSpeciesCPUE <- function(year,
 
     if (verbose) message("[ ", key, " ] checking DATRAS...")
 
-    # 2a. Availability
-    quarters_ok <- tryCatch(
-      icesDatras::getSurveyYearQuarterList(surv, year),
-      error = function(e) NULL
-    )
-    if (is.null(quarters_ok) || !(q %in% quarters_ok)) {
-      if (verbose) message("  -> not available, skipping.")
-      next
+    # 2a. Check for local data (bypasses DATRAS availability check)
+    has_local_HH <- !is.null(local_HH) &&
+      any(local_HH$Survey == surv & local_HH$Quarter == as.character(q))
+    has_local_HL <- !is.null(local_HL) &&
+      any(local_HL$Survey == surv & local_HL$Quarter == as.character(q))
+
+    # Availability check omitido — el bug de rbindlist/Doortype en icesDatras 1.4.1
+    # puede ocurrir tambien en getSurveyYearQuarterList. Se delega la deteccion
+    # de datos ausentes al propio intento de descarga (getDATRAS / getHLdata).
+    if (has_local_HH || has_local_HL) {
+      if (verbose) message("  -> local data found, skipping DATRAS availability check.")
     }
 
-    # 2b. Download HL
-    hl <- tryCatch(
-      icesDatras::getDATRAS("HL", surv, year, q),
-      error = function(e) { message("  -> HL error: ", conditionMessage(e)); NULL }
-    )
-    if (is.null(hl) || !is.data.frame(hl) || nrow(hl) == 0) {
-      if (verbose) message("  -> no HL data, skipping.")
-      next
+    # 2b. Download HL (skip if all HL comes from local_HL)
+    if (has_local_HL) {
+      # Use only local HL for this survey+quarter
+      hl <- local_HL[
+        local_HL$Survey  == surv &
+          local_HL$Quarter == as.character(q), ]
+      hl$DataType <- "R"
+      if (verbose) message("  -> HL from local_HL (", nrow(hl), " rows), skipping DATRAS HL download.")
+    } else {
+      # Bug icesDatras 1.4.1: rbindlist/Doortype lanza errores C-level que
+      # tryCatch no atrapa. Se usa try() que es mas robusto para estos casos.
+      hl <- try(icesDatras::getDATRAS("HL", surv, year, q), silent = TRUE)
+      if (inherits(hl, "try-error")) {
+        if (verbose) message("  -> getDATRAS HL error, reintentando con getHLdata()...")
+        hl <- try(icesDatras::getHLdata(surv, year, q), silent = TRUE)
+      }
+      if (inherits(hl, "try-error")) hl <- NULL
+      if (is.null(hl) || !is.data.frame(hl) || nrow(hl) == 0) {
+        if (verbose) message("  -> no HL data, skipping.")
+        next
+      }
     }
 
-    # 2c. Get HH (cache or fresh download)
+    # 2b2. Inject local HL rows — solo si HL vino de DATRAS (has_local_HL=FALSE)
+    #       Si has_local_HL=TRUE el HL ya viene integro de local_HL (ver 2b).
+    if (!has_local_HL && !is.null(local_HL)) {
+      loc <- local_HL[
+        local_HL$Survey  == surv &
+          local_HL$Quarter == as.character(q), ]
+      if (nrow(loc) > 0) {
+        # Alinear columnas con el HL de DATRAS
+        common_cols <- intersect(names(hl), names(loc))
+        loc <- loc[, common_cols, drop = FALSE]
+        # Columnas que faltan en loc → NA
+        missing <- setdiff(names(hl), common_cols)
+        for (mc in missing) loc[[mc]] <- NA
+        loc$DataType <- "R"   # datos locales siempre son raw counts
+        hl <- rbind(hl, loc[, names(hl)])
+        if (verbose) message("  -> injected ", nrow(loc),
+                             " local HL rows for ", surv, " Q", q)
+      }
+    }
+    # 2c. Get HH: local_HH > IBTSSurveySummary cache > DATRAS download
     hh <- NULL
-    if (!is.null(HHdata) && !is.null(HHdata$data[[key]])) {
+    if (has_local_HH) {
+      hh <- local_HH[
+        local_HH$Survey  == surv &
+          local_HH$Quarter == as.character(q), ]
+      if (verbose) message("  -> HH from local_HH (", nrow(hh), " rows)")
+    }
+    if (is.null(hh) && !is.null(HHdata) && !is.null(HHdata$data[[key]])) {
       hh <- HHdata$data[[key]]
       if (verbose) message("  -> HH from IBTSSurveySummary cache")
     }
@@ -184,8 +238,12 @@ IBTSGetSpeciesCPUE <- function(year,
     }
 
     # 2d. Valid hauls
+    # NOTA: en NS-IBTS HaulNo NO es unico — cada pais usa numeracion propia.
+    # La clave unica es HaulNo + Country. Se usa paste() para el filtro.
     hh_use <- if (valid_only) hh[hh$HaulVal %in% c("V", "A"), ] else hh
-    hl     <- hl[hl$HaulNo %in% hh_use$HaulNo, ]
+    hl_key <- paste(hl$HaulNo,     hl$Country)
+    hh_key <- paste(hh_use$HaulNo, hh_use$Country)
+    hl     <- hl[hl_key %in% hh_key, ]
     if (nrow(hl) == 0) {
       if (verbose) message("  -> no valid hauls in HL.")
       next
@@ -198,11 +256,11 @@ IBTSGetSpeciesCPUE <- function(year,
     # Each HL row gets the DataType of its parent haul via HaulNo.
     # -------------------------------------------------------------------------
     hh_cols <- intersect(
-      c("HaulNo","HaulDur","ShootLat","ShootLong","Ship","DataType"),
+      c("HaulNo","Country","HaulDur","ShootLat","ShootLong","Ship","DataType"),
       names(hh_use)
     )
     hl <- merge(hl, hh_use[, hh_cols, drop = FALSE],
-                by = "HaulNo", all.x = TRUE)
+                by = c("HaulNo","Country"), all.x = TRUE)
 
     if (!"DataType" %in% names(hl)) {
       if (verbose) message("  -> DataType absent from HH, defaulting to 'R'")
@@ -308,8 +366,14 @@ IBTSGetSpeciesCPUE <- function(year,
     hl <- hl[!is.na(hl$Species_Code), ]
     if (nrow(hl) == 0) next
 
-    if (!"Ship" %in% names(hl)) hl$Ship <- "unknown"
-
+    if (!"Ship" %in% names(hl)) {
+      hl$Ship <- "unknown"
+    } else {
+      hl$Ship[is.na(hl$Ship)] <- "unknown"
+    }
+    if (!"Country" %in% names(hl)) hl$Country <- "UNK"
+    hl$Country[is.na(hl$Country)] <- "UNK"
+    hl$Ship[is.na(hl$Ship)]       <- "unknown"
     # ---- 4. Aggregate by HaulNo x Species: Group1 / Group2 / Total ----------
     #
     # Group1 (small / pre-recruit):  LngtClas_cm <  LengthSplit
@@ -330,7 +394,7 @@ IBTSGetSpeciesCPUE <- function(year,
 
       # Total CPUE per haul (all lengths)
       dumbtot <- stats::aggregate(
-        CPUE_n_h ~ HaulNo + Ship + DataType,
+        CPUE_n_h ~ HaulNo + Country + Ship + DataType,
         data = dumb, FUN = sum, na.rm = TRUE
       )
       names(dumbtot)[names(dumbtot) == "CPUE_n_h"] <- "Total"
@@ -338,7 +402,8 @@ IBTSGetSpeciesCPUE <- function(year,
       if (is.na(len_spl)) {
         # No size split for this species
         dattot <- data.frame(
-          HaulNo = dumbtot$HaulNo, Ship = dumbtot$Ship,
+          HaulNo = dumbtot$HaulNo, Country = dumbtot$Country,
+          Ship = dumbtot$Ship,
           DataType = dumbtot$DataType, Species_Code = i,
           Group1 = NA_real_, Group2 = NA_real_, Total = dumbtot$Total,
           stringsAsFactors = FALSE
@@ -348,34 +413,30 @@ IBTSGetSpeciesCPUE <- function(year,
         dumbsm <- dumb[dumb$LngtClas_cm < len_spl, ]
         if (nrow(dumbsm) > 0) {
           dumbsm <- stats::aggregate(
-            CPUE_n_h ~ HaulNo + Ship, dumbsm, sum, na.rm = TRUE)
+            CPUE_n_h ~ HaulNo + Country + Ship, dumbsm, sum, na.rm = TRUE)
           names(dumbsm)[names(dumbsm) == "CPUE_n_h"] <- "Group1"
         } else {
-          dumbsm <- data.frame(
-            HaulNo = unique(dumb$HaulNo),
-            Ship   = dumb$Ship[match(unique(dumb$HaulNo), dumb$HaulNo)],
-            Group1 = 0, stringsAsFactors = FALSE)
+          haul_uniq <- unique(dumb[, c("HaulNo","Country","Ship")])
+          dumbsm <- data.frame(haul_uniq, Group1 = 0, stringsAsFactors = FALSE)
         }
 
         # Group2: large (>= LengthSplit cm)
         dumblg <- dumb[dumb$LngtClas_cm >= len_spl, ]
         if (nrow(dumblg) > 0) {
           dumblg <- stats::aggregate(
-            CPUE_n_h ~ HaulNo + Ship, dumblg, sum, na.rm = TRUE)
+            CPUE_n_h ~ HaulNo + Country + Ship, dumblg, sum, na.rm = TRUE)
           names(dumblg)[names(dumblg) == "CPUE_n_h"] <- "Group2"
         } else {
-          dumblg <- data.frame(
-            HaulNo = unique(dumb$HaulNo),
-            Ship   = dumb$Ship[match(unique(dumb$HaulNo), dumb$HaulNo)],
-            Group2 = 0, stringsAsFactors = FALSE)
+          haul_uniq <- unique(dumb[, c("HaulNo","Country","Ship")])
+          dumblg <- data.frame(haul_uniq, Group2 = 0, stringsAsFactors = FALSE)
         }
 
-        datsize <- merge(dumbsm, dumblg, by = c("HaulNo","Ship"), all = TRUE)
+        datsize <- merge(dumbsm, dumblg, by = c("HaulNo","Country","Ship"), all = TRUE)
         dattot  <- merge(datsize,
-                         dumbtot[, c("HaulNo","Ship","DataType","Total")],
-                         by = c("HaulNo","Ship"), all = TRUE)
+                         dumbtot[, c("HaulNo","Country","Ship","DataType","Total")],
+                         by = c("HaulNo","Country","Ship"), all = TRUE)
         dattot  <- data.frame(
-          dattot[, c("HaulNo","Ship","DataType")],
+          dattot[, c("HaulNo","Country","Ship","DataType")],
           Species_Code = i,
           dattot[, c("Group1","Group2","Total")],
           stringsAsFactors = FALSE
@@ -388,9 +449,9 @@ IBTSGetSpeciesCPUE <- function(year,
     if (is.null(survey_data) || nrow(survey_data) == 0) next
 
     # ---- 5. Merge coordinates -----------------------------------------------
-    coord_cols  <- intersect(c("HaulNo","ShootLat","ShootLong"), names(hh_use))
+    coord_cols  <- intersect(c("HaulNo","Country","ShootLat","ShootLong"), names(hh_use))
     survey_data <- merge(survey_data, hh_use[, coord_cols, drop = FALSE],
-                         by = "HaulNo", all.x = TRUE)
+                         by = c("HaulNo","Country"), all.x = TRUE)
 
     survey_data$Survey_Code  <- surv
     survey_data$Survey_Year  <- as.integer(year)
@@ -413,11 +474,11 @@ IBTSGetSpeciesCPUE <- function(year,
 
     col_order   <- c("Survey_Code","Longitude","Latitude",
                      "Survey_Year","Quarter",
-                     "Haul_Code","Vessel_Code","DataType",
+                     "Haul_Code","Country","Vessel_Code","DataType",
                      "Species_Code","Common_Name","Length_Split",
                      "Group1","Group2","Total")
     survey_data <- survey_data[, intersect(col_order, names(survey_data)),
-                                drop = FALSE]
+                               drop = FALSE]
     out_list[[s_idx]] <- survey_data
 
     if (verbose) {

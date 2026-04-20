@@ -5,9 +5,8 @@
 \title{Function IBTSNeAtl_map plots the map with all the NeAtl IBTS surveys}
 \usage{
 IBTSNeAtl_map64(
-  nl = 60.5,
-  sl = 36,
-  xlims = c(-18, 3),
+  xlims = NULL,
+  ylims = NULL,
   leg = TRUE,
   legpos = "bottomright",
   cex.leg = 0.9,
@@ -27,7 +26,7 @@ IBTSNeAtl_map64(
   lwdl = 0.1,
   shpdir = system.file("shapes", package = "NeAtlIBTS64"),
   places = FALSE,
-  minpop = 200000,
+  minpop = 2e+05,
   newdev = TRUE,
   graf = FALSE,
   xpng = 1200,
@@ -36,11 +35,12 @@ IBTSNeAtl_map64(
 )
 }
 \arguments{
-\item{nl}{northernmost limit of the map (default 60.5)}
+\item{xlims}{longitude limits as c(west, east). NULL (default) uses c(-18,3)
+when NS=FALSE and c(-18,11) when NS=TRUE. User-supplied values always take precedence.}
 
-\item{sl}{southernmost limit of the map (default 36.0)}
-
-\item{xlims}{longitude limits as c(west, east) (default c(-18, 3))}
+\item{ylims}{latitude limits as c(south, north). NULL (default) uses c(36,60.5)
+when NS=FALSE and c(36,62) when NS=TRUE. User-supplied values always take precedence.
+Replaces the legacy nl/sl parameters.}
 
 \item{leg}{if TRUE includes the legend (default TRUE)}
 
@@ -63,10 +63,6 @@ IBTSNeAtl_map64(
 \item{NS}{if TRUE adds the North Sea ICES rectangle grid (default FALSE)}
 
 \item{bathy}{if TRUE plots the isobaths (default TRUE)}
-
-\item{bathy_col}{colour for isobath lines (default "gray55")}
-
-\item{bathy_lwd}{line width for isobath lines (default 0.4)}
 
 \item{bw}{if TRUE land in grey, if FALSE in burlywood3 (default FALSE)}
 

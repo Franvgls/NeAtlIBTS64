@@ -1,10 +1,10 @@
-#' Function qcHaulsPosit plots warp length vs. Depth behaviour 
-#' 
+#' Function qcHaulsPosit plots warp length vs. Depth behaviour
+#'
 #' Produces a warplength vs. DoorSpread plot and a model with lm unction. Data are taken directly from DATRAS using function getHHdata from library(icesDatras)
 #' It only produces plots for surveys with HH files uploaded in DATRAS
 #' Since sweeps length does not affect the warp that is decided by the chief scientist, there are no differences depending on sweeps
 #' Maps try to use ShootLat and ShootLong cause old data from NS have a lot of -9 (NA) values in the NS-IBTS
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param country: The country chosen to be plotted (checks if it's available in the HH file)
@@ -36,7 +36,7 @@ qcHaulsPosit<-function(Survey="NS-IBTS",years,quarter,col1="red",ti=TRUE,Hpoints
   for(i in 1:nrow(dumb)) {
     if(dumb$HaulLat[i]==c(-9)) {dumb$HaulLat[i]<-NA}
     if(dumb$HaulLong[i]==c(-9)) {dumb$HaulLong[i]<-NA}
-    }  
+    }
   countries<-unique(dumb$Country)
   #dumb<-dplyr::filter(dumb,Country==country)
   if (length(unique(dumb$Year))>1) stop("Only one year can be shown in this function")
@@ -48,11 +48,12 @@ qcHaulsPosit<-function(Survey="NS-IBTS",years,quarter,col1="red",ti=TRUE,Hpoints
   if (any(Survey=="SP-PORC")) replong<-2
   if (any(Survey=="SCOROC")) replong<-9
   if (any(! Survey %in% c("SP-PORC","SCOROC"))) replong<-.5
-  ##  
-  IBTSNeAtl_map64(load=F,NS=F,leg=F,newdev=FALSE,xlims = c(min(dumb$ShootLong)-.5,replong+max(dumb$ShootLong)),sl=min(dumb$ShootLat)-.5,nl=.5+max(dumb$ShootLat))
+  ##
+  IBTSNeAtl_map64(load=F,NS=F,leg=F,newdev=FALSE,xlims = c(min(dumb$ShootLong)-.5,replong+max(dumb$ShootLong))
+                  ,ylims=c(min(dumb$ShootLat)-.5,.5+max(dumb$ShootLat)),places=T)
   segments(dumb$ShootLong,dumb$ShootLat,dumb$HaulLong,dumb$HaulLat,col="red",lwd=2)
-  if (Nhauls) text(dumb$ShootLong,dumb$ShootLat,labels = dumb$HaulNo,cex=.8) 
-  if (Hpoints) points(ShootLat~ShootLong,dumb,pch=21,cex=2,bg="blue") 
+  if (Nhauls) text(dumb$ShootLong,dumb$ShootLat,labels = dumb$HaulNo,cex=.8)
+  if (Hpoints) points(ShootLat~ShootLong,dumb,pch=21,cex=2,bg="blue")
   if (is.logical(ti)) {
     if (ti) {tit<-list(paste0(Survey," ",years," ",paste0("Q",quarter,collapse = "-")),font=2,cex=1.2*esc.mult)}
     else {tit<-NULL}
@@ -69,5 +70,5 @@ qcHaulsPosit<-function(Survey="NS-IBTS",years,quarter,col1="red",ti=TRUE,Hpoints
 }
 
 
-   
+
 

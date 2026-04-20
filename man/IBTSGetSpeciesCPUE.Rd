@@ -11,6 +11,7 @@ IBTSGetSpeciesCPUE(
   quarters = NULL,
   valid_only = TRUE,
   HHdata = NULL,
+  local_HL = NULL,
   verbose = TRUE
 )
 }
@@ -34,7 +35,11 @@ E.g. \code{c(3, 4)} skips all Q1 surveys.  Default NULL = all quarters.}
 \item{valid_only}{Logical.  Keep only HaulVal \\%in\\% c("V","A").
 Default TRUE.}
 
-\item{HHdata}{Output of \code{IBTSSurveySummary()} to reuse cached HH data.
+\item{local_HL}{data.frame opcional en formato DATRAS HL con datos locales
+(e.g. especies no subidas aún a DATRAS). Se filtra por \code{Survey} y
+\code{Quarter} y se añade mediante \code{rbind} al HL descargado antes
+de cualquier procesamiento. \code{DataType} se fuerza a \code{"R"}.
+El \code{HaulDur} se tomará del HH existente vía \code{HaulNo}.#' @param HHdata Output of \code{IBTSSurveySummary()} to reuse cached HH data.
 NULL downloads fresh HH from DATRAS for each survey.}
 
 \item{verbose}{Logical.  Print progress messages.  Default TRUE.}

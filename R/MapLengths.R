@@ -19,7 +19,7 @@
 #' @return during the calculations shows the types of data in the file "C", "P", "R", And the species of the set present in the Survey/year
 #' @examples MapLengths("SP-NORTH",2024,4,esp="HKE",tmin=0,tmax=20,zeros=T,add=F)
 #' @examples MapLengths("NS-IBTS",2023,3,esp="MEG",tmin=20,tmax=50,zeros=T,add=F)
-#' @examples NeAtlIBTS::IBTSNeAtl_map(load=F,leg=F,xlims=c(-16,13),bw=T);MapLengths("NS-IBTS",2023,3,esp="HKE",tmin=0,tmax=21,zeros=T,add=T)
+#' @examples NeAtlIBTS64::IBTSNeAtl_map64(load=F,leg=F,xlims=c(-16,13),bw=T);MapLengths("NS-IBTS",2023,3,esp="HKE",tmin=0,tmax=21,zeros=T,add=T)
 #' @export
 #setwd("D:/FVG/Campanas/IBTS/IBTS_2024/mapping/DATOS")
 MapLengths<-function(esp,dtSurv,dtyear,dtq,tmin,tmax,add=FALSE,ti=TRUE,subti=TRUE,leg=TRUE,colo="red",bw=FALSE,save.dat=FALSE,out.dat=FALSE,zeros=FALSE,onlyVal=F,cexleg=1,escmult=1,escCPUE=NA) {
@@ -59,7 +59,7 @@ MapLengths<-function(esp,dtSurv,dtyear,dtq,tmin,tmax,add=FALSE,ti=TRUE,subti=TRU
   datmap<-aggregate(CPUE~Year+Survey+Ship+HaulNo,dat.HL,sum)
   toplot<-merge(datmap,dat.HH[,c("HaulNo","ShootLat","ShootLong")],by="HaulNo")
       if (!add) {
-    NeAtlIBTS64::IBTSNeAtl_map64(load=F,leg=F,dens=0,nl=max(dat.HH$ShootLat)+.5,sl=min(dat.HH$ShootLat)-.5,bw=ifelse(bw,T,F),
+    NeAtlIBTS64::IBTSNeAtl_map64(load=F,leg=F,dens=0,ylims=c(min(dat.HH$ShootLat)-.5,max(dat.HH$ShootLat)+.5),bw=ifelse(bw,T,F),
                              xlims=c(min(dat.HH$ShootLong)-1,1+ifelse(max(dat.HH$ShootLong)>-8,max(dat.HH$ShootLong),-8)))
       }
         if (ti) title(main=SpeciesCodes[match(esp,SpeciesCodes$Code),"Scientific"],font.main=4,line=2.5,cex.main=1*cexleg)

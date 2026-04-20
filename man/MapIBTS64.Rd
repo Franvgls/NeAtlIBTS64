@@ -12,7 +12,6 @@ MapIBTS64(
   dato = 1,
   NS = TRUE,
   noutliers = 5,
-  outlier_min_max = 20,
   scaler = 0.35,
   sl = 35,
   nl = 61.5,
@@ -55,11 +54,6 @@ Use \code{"Stations"} to plot station positions only.}
 
 \item{noutliers}{Integer. Number of top-value hauls to treat as outliers
 (drawn as open circles with a "> N" label). Default 5.}
-
-\item{outlier_min_max}{Numeric. Minimum value of the non-zero maximum (mxd)
-required to activate outlier detection. If mxd < outlier_min_max outliers
-are disabled regardless of noutliers (all points drawn at real scale).
-Default 20.}
 
 \item{scaler}{Numeric. Bubble-size divisor. Increase to shrink all bubbles.
 Default 0.35 (same as legacy MapIBTS).}

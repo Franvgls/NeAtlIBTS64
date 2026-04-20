@@ -4,11 +4,16 @@
 #' @param surveys Named list con survey -> vector de quarters. Si NULL usa la
 #'   tabla por defecto del IBTSWG
 #' @param only_valid Si TRUE filtra solo HaulVal=="V"
+#' @param local_HH data.frame opcional en formato DATRAS HH con datos locales
+#'   (e.g. PT-IBTS Q4 no subido aun a DATRAS). Debe tener columnas \code{Survey}
+#'   y \code{Quarter}. Si hay filas para un \code{surv+q}, se usan en vez de
+#'   descargar de DATRAS y se omite el chequeo de disponibilidad para esa clave.
 #' @return Lista con un data.frame por survey y un data.frame resumen global
 #' @export
 IBTSSurveySummary <- function(year,
                               surveys = NULL,
-                              only_valid = FALSE) {
+                              only_valid = FALSE,
+                              local_HH   = NULL) {
 
   # Tabla por defecto: surveys conocidas del NeAtl IBTS y sus quarters
   if (is.null(surveys)) {
@@ -37,28 +42,38 @@ IBTSSurveySummary <- function(year,
       key <- paste0(surv, "_Q", q)
       message("Descargando ", key, "...")
 
-      # Comprobar si existe el año Y el trimestre antes de descargar
-      quarters_ok <- tryCatch({
-        suppressMessages(suppressWarnings(
-          icesDatras::getSurveyYearQuarterList(surv, year)
-        ))
-      }, error = function(e) NULL)
+      # Comprobar si hay datos locales para esta clave
+      has_local <- !is.null(local_HH) &&
+        any(local_HH$Survey == surv & local_HH$Quarter == as.character(q))
 
-      if (is.null(quarters_ok) || !(q %in% quarters_ok)) {
-        message("  Sin datos en DATRAS: ", key)
-        next
-      }
+      if (has_local) {
+        hh <- local_HH[local_HH$Survey == surv &
+                         local_HH$Quarter == as.character(q), ]
+        message("  -> HH de local_HH (", nrow(hh), " filas), omitiendo DATRAS.")
+      } else {
+        # Comprobar si existe el año Y el trimestre antes de descargar
+        quarters_ok <- tryCatch({
+          suppressMessages(suppressWarnings(
+            icesDatras::getSurveyYearQuarterList(surv, year)
+          ))
+        }, error = function(e) NULL)
 
-      hh <- tryCatch({
-        suppressMessages(
-          suppressWarnings(
-            icesDatras::getHHdata(surv, year, q)
+        if (is.null(quarters_ok) || !(q %in% quarters_ok)) {
+          message("  Sin datos en DATRAS: ", key)
+          next
+        }
+
+        hh <- tryCatch({
+          suppressMessages(
+            suppressWarnings(
+              icesDatras::getHHdata(surv, year, q)
+            )
           )
+        },
+        error   = function(e) { message("  Sin datos: ", surv, " Q", q); return(NULL) },
+        warning = function(w) { message("  Aviso: ", surv, " Q", q, " - ", conditionMessage(w)); return(NULL) }
         )
-      },
-      error   = function(e) { message("  Sin datos: ", surv, " Q", q); return(NULL) },
-      warning = function(w) { message("  Aviso: ", surv, " Q", q, " - ", conditionMessage(w)); return(NULL) }
-      )
+      }
 
       if (is.null(hh) || nrow(hh) == 0) next
 

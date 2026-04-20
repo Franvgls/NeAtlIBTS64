@@ -43,7 +43,9 @@ SurveyMap.IBTS<-function(Survey,Year,Quarter,ti=TRUE,leg=TRUE,legpos="bottomrigh
   if (any(Survey=="SCOROC")) replong<- 9
   if (any(! Survey %in% c("SP-PORC","SCOROC"))) replong<-.5
   ##
-  IBTSNeAtl_map64(load=F,NS=F,leg=F,newdev=FALSE,xlims = c(min(hauls$ShootLong)-.5,replong+max(hauls$ShootLong)),sl=min(hauls$ShootLat)-.5,nl=.5+max(hauls$ShootLat),ICESrect = ICESrect,ICESlab = ICESlab,ICESlabcex = ICESlabcex,axlab = axlab)
+  IBTSNeAtl_map64(load=F,NS=F,leg=F,newdev=FALSE,xlims = c(min(hauls$ShootLong)-.5,replong+max(hauls$ShootLong)),
+                  ylims=c(min(hauls$ShootLat)-.5,.5+max(hauls$ShootLat)),places = T,ICESrect = ICESrect,ICESlab = ICESlab,
+                  ICESlabcex = ICESlabcex,axlab = axlab)
   if (country) {
     sweeplngt=FALSE
     points(ShootLat~ShootLong,hauls,pch=21,col="black",bg=as.factor(hauls$Country))
