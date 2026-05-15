@@ -53,5 +53,7 @@ If there are two different sweeps in the data, produces a model for each sweep l
 Surveys available in DATRAS: i.e. NS-IBTS,SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 }
 \examples{
+\dontrun{
 gearPlotHHNS.nodp(Survey="NS-IBTS",years=c(2014:2016),quarter=3,country="ENG")
+}
 }

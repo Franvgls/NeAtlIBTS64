@@ -7,7 +7,7 @@
 #' @param getICES: Should the data be downloaded from DATRAS? If T, default, the data are taken from DATRAS through the icesDATRAS package. If F it analyzes the HH dataframe just with the available years independently of the years and quarter asked for.
 #' @details Surveys available in DATRAS: i.e. NS-IBTS, SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a graph with WingSpread vs. Depth. it also includes information on the ship, the time series used, the models and parameters estimated.
-#' #' @examples
+#' @examples
 #' \dontrun{
 #' InfoHH(Survey="SWC-IBTS",years=c(2011:2016),quarter=4)
 #' }

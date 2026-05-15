@@ -58,5 +58,7 @@ Maps try to use ShootLat and ShootLong cause old data from NS have a lot of -9 (
 Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 }
 \examples{
+\dontrun{
 gearPlotdumb.wrpdp("NS-IBTS",c(2014:2017),1,"SWE")
+}
 }

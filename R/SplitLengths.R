@@ -12,9 +12,10 @@
 #' @details Surveys available in DATRAS recent years and not discontinued: EVHOE, FR-CGFS,
 #' FR-WCGFS, IE-IAMS, IE-IGFS, NIGFS, NS-IBTS, PT-IBTS, SCOROC, SCOWCGFS, SP-ARSA, SP-NORTH, SP-PORC
 #' @return during the calculations shows the types of data in the file "C", "P", "R", And the species of the set present in the Survey/year
+#' @examples
 #' \dontrun{
-#' @examples SplitLengths("NS-IBTS",2023,3,esp="HKE",zeros=T)
-#' @examples SplitLengths("NS-IBTS",2023,3,esp="MEG",zeros=T)
+#' SplitLengths("NS-IBTS",2023,3,esp="HKE",zeros=T)
+#' SplitLengths("NS-IBTS",2023,3,esp="MEG",zeros=T)
 #' }
 #' @export
 #setwd("D:/FVG/Campanas/IBTS/IBTS_2024/mapping/DATOS")

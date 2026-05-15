@@ -49,6 +49,8 @@ Surveys available in DATRAS recent years and not discontinued: EVHOE, FR-CGFS,
 FR-WCGFS, IE-IAMS, IE-IGFS, NIGFS, NS-IBTS, PT-IBTS, SCOROC, SCOWCGFS, SP-ARSA, SP-NORTH, SP-PORC
 }
 \examples{
+\dontrun{
 SplitLengths("NS-IBTS",2023,3,esp="HKE",zeros=T)
 SplitLengths("NS-IBTS",2023,3,esp="MEG",zeros=T)
+}
 }

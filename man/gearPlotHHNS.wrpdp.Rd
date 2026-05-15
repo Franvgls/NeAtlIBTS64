@@ -47,5 +47,7 @@ Since sweeps length does not affect the warp that is decided by the chief scient
 Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 }
 \examples{
+\dontrun{
 gearPlotHHNS.wrpdp("NS-IBTS",c(2014:2017),1,"SWE")
+}
 }

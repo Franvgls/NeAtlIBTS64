@@ -54,5 +54,7 @@ If there are two different sweeps in the data, produces a model for each sweep l
 Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 }
 \examples{
+\dontrun{
 gearPlotHHN21.dodp("SP-NORTH",c(2021),3,.8,.3,col1="darkblue",col2="red")
+}
 }

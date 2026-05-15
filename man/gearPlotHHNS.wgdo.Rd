@@ -47,6 +47,8 @@ If there are two different sweeps in the data, produces a model for each sweep l
 Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 }
 \examples{
+\dontrun{
 gearPlotHHNS.wgdo("NS-IBTS",c(2016:2017),1,"SWE")
 gearPlotHHNS.wgdo("NS-IBTS",c(2015:2017),1,"SWE")
+}
 }

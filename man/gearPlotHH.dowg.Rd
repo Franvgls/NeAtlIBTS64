@@ -57,9 +57,10 @@ If there are two different sweeps in the data, produces a model for each sweep l
 Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 }
 \examples{
+\dontrun{
 gearPlotHH.dowg("SCOWCGFS",c(2014:2016),1,col1="darkblue",col2="steelblue3")
 gearPlotHH.dowg("SCOWCGFS",c(2013:2016),4)
-.gearPlotHH.dowg("SCOROC",c(2013:2016),3)
+gearPlotHH.dowg("SCOROC",c(2013:2016),3)
 gearPlotHH.dowg("NIGFS",c(2015:2016),1)
 gearPlotHH.dowg("NIGFS",c(2006:2007,2009:2016),4)
 gearPlotHH.dowg("IE-IGFS",c(2011:2016),4)
@@ -70,4 +71,5 @@ gearPlotHH.dowg("SP-NORTH",c(2014:2016),4,col1="darkblue")
 gearPlotHH.dowg("SP-ARSA",c(2014:2016),1,col1="darkblue",col2="steelblue2")
 gearPlotHH.dowg("SP-ARSA",c(2014:2016),4)
 gearPlotHH.dowg(damb,c(2014:2016),4,getICES=F,pF=F)
+}
 }

@@ -20,5 +20,7 @@ A vector with the species list in the HL
 Species list in DATRAS HL
 }
 \examples{
-\dontrun{SpeciesInHL("SP-NORTH", 2025, 4)}
+\dontrun{
+SpeciesInHL("SP-NORTH", 2025, 4)
+}
 }

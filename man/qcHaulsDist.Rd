@@ -56,7 +56,9 @@ It only produces plots for surveys with HH files uploaded in DATRAS
 Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 }
 \examples{
+\dontrun{
 qcHaulsDist("SP-NORTH",c(2024),4,error="Speed"); qcHaulsDist("IE-IAMS",2024,quarter=c(1,1),error="Course")
+}
 }
 \references{
 distHaversine function gives the haversine calculation of distance between two geographic points \code{\link[geosphere]{distHaversine}}

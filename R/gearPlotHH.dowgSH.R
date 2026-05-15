@@ -18,7 +18,7 @@
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a graph with WingSpread vs. DoorSpread, it also includes information on the ship, the time series used, the models and parameters estimated.
 #' @examples
-#' \dontrun[
+#' \dontrun{
 #' gearPlotHH.dowg("SCOWCGFS",c(2014:2016),1,col1="darkblue",col2="steelblue3")
 #' gearPlotHH.dowg("SP-ARSA",c(2014:2016),4)
 #' gearPlotHH.dowg(damb,c(2014:2016),4,getICES=F,pF=F)

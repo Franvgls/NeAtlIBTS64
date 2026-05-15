@@ -1,6 +1,6 @@
 Package: NeAtlIBTS64
 Title: Scripts and functions for the IBTSNeAtl in 64bits 
-Version: 0.0.4
+Version: 0.0.5
 Authors@R: 
     person("Francisco", "Velasco", , "Franvgls@gmail.com", role = c("aut", "cre"),comment=c(ORCID="0000-0002-6420-9474"))
 Description: R 4.x port of NeAtlIBTS. Provides quality-control plotting and

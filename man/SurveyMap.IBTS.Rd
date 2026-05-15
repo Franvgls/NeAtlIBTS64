@@ -64,8 +64,10 @@ Presents the map with the stations and a legend with the countries that have par
 Uses the DATRAS HH data of a survey, year and quarter to plot stations in a map
 }
 \examples{
+\dontrun{
 SurveyMap.IBTS("NS-IBTS",2021,3,sweeplngt=F,country=T,graf="NS_2021_Q3")
 SurveyMap.IBTS("FR-WCGFS",2023,3,ICESrect = T,ICESlab = T,ICESlabcex = .6)
+}
 }
 \seealso{
 Other maps: 

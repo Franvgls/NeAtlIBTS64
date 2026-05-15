@@ -23,5 +23,7 @@ Function getDatras2 modification of function getDATRAS to give the possibility o
 Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 }
 \examples{
+\dontrun{
 getDatras2("HH","SP-NORTH",c(2014:2016),4,listData=FALSE)
+}
 }

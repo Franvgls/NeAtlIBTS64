@@ -47,15 +47,9 @@ If there are DoorSpread and WingSpread values in HH records produces four graphs
 Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 }
 \examples{
+\dontrun{
 gearPlotsHH("SWC-IBTS",c(2014:2016),1)
-gearPlotsHH("SWC-IBTS",c(2013:2016),4)
-gearPlotsHH("ROCKALL",c(2013:2016),3)
-gearPlotsHH("IE-IGFS",c(2011:2016),4)
-gearPlotsHH("SP-PORC",c(2003:2016),3)
-gearPlotsHH("FR-CGFS",c(2015:2016),4)
-gearPlotsHH("EVHOE",c(1997:2015),4)
-gearPlotsHH("SP-NORTH",c(2014:2016),4)
-gearPlotsHH("SP-ARSA",c(2014:2016),1)
 gearPlotsHH("SP-ARSA",c(2014:2016),4)
 gearPlotsHH(damb,c(2014:2016),4,getICES=F)
+}
 }
