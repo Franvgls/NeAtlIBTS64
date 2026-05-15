@@ -1,10 +1,10 @@
 #' Function gearPlotHH.nodp to plot net opening vs. depth including the NS-IBTS and producing plots by country
-#' 
-#'  
+#'
+#'
 #' Produces Net Vertical opening vs. Depth plot and a model with nls R function. Data are taken directly from DATRAS getting all the data from DATRAS using function getHHdata from library(icesDatras)
 #' it only produces plots for surveys with HH files uploaded in DATRAS
 #' If there are two different sweeps in the data, produces a model for each sweep length.
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param country: The country chosen to be plotted (checks if it's available in the HH file)
@@ -17,7 +17,10 @@
 #' @param ti: if T includes autmoatically the title, F leaves it blank an can be added later.
 #' @details Surveys available in DATRAS: i.e. NS-IBTS,SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces Net Vertical opening vs. Depth plot it also includes information on the ship, the time series used (bottom fourth graph), the models and parameters estimated.
-#' @examples gearPlotHHNS.nodp(Survey="NS-IBTS",years=c(2014:2016),quarter=3,country="ENG")
+#' @examples
+#' \dontrun{
+#' gearPlotHHNS.nodp(Survey="NS-IBTS",years=c(2014:2016),quarter=3,country="ENG")
+#' }
 #' @export
 gearPlotHHNS.nodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.intb=.3,col1="darkblue",col2="steelblue2",getICES=TRUE,pF=TRUE,ti=TRUE) {
   if (getICES) {
@@ -40,7 +43,7 @@ gearPlotHHNS.nodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
          ylab="Vertical opening (m)",xlab="Depth (m)",subset=Year!=years[length(years)] & Netopening> c(-9))
          if (ti) title(main=paste0("Vertical opening vs. Depth in ",country," ",dumb$Survey[1],".Q",quarter," survey"),line=2.5)
          mtext(paste("Ship: ",paste0(unique(dumb$Ship),collapse=" ")),line=.4,cex=.8,adj=0)
-      if (pF) points(Netopening~Depth,dumb,pch=21,col=col1,subset=Year!=years[length(years)] & Netopening> c(-9))    
+      if (pF) points(Netopening~Depth,dumb,pch=21,col=col1,subset=Year!=years[length(years)] & Netopening> c(-9))
              if (length(levels(dumb$sweeplngt))<2) {
            dp<-seq(dpthA[1],dpthA[2]+20,length=650)
            Netopening.log<-nls(Netopening~a1+b1*log(Depth),dumb,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(0))
@@ -69,10 +72,10 @@ gearPlotHHNS.nodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
            Netopeninglg.log<-nls(Netopening~a1+b1*log(Depth),dumblong,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(-9))
            vrtst<-range(subset(dumbshort$Netopening,dumbshort$Netopening> c(-9)))
            vrtlg<-range(subset(dumblong$Netopening,dumblong$Netopening> c(-9)))
-           if (pF) {points(Netopening~Depth,dumbshort,subset=HaulVal=="V",pch=21,col=col2)   
-              points(Netopening~Depth,dumbshort,subset=Year==years[length(years)],pch=21,bg=col2,lwd=1)   
-              points(Netopening~Depth,dumblong,subset=HaulVal=="V",pch=21,col=col1)   
-              points(Netopening~Depth,dumblong,subset=Year==years[length(years)],pch=21,bg=col1,lwd=1)   
+           if (pF) {points(Netopening~Depth,dumbshort,subset=HaulVal=="V",pch=21,col=col2)
+              points(Netopening~Depth,dumbshort,subset=Year==years[length(years)],pch=21,bg=col2,lwd=1)
+              points(Netopening~Depth,dumblong,subset=HaulVal=="V",pch=21,col=col1)
+              points(Netopening~Depth,dumblong,subset=Year==years[length(years)],pch=21,bg=col1,lwd=1)
            }
            a1st<-round(coef(Netopeningst.log)[1],2)
            b1st<-round(coef(Netopeningst.log)[2],2)
@@ -104,4 +107,3 @@ gearPlotHHNS.nodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
 #         text(0,0, txt,adj=0.01,font=1, cex=.9,pos=4)
       }
       }
-            

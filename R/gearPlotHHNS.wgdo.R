@@ -1,9 +1,9 @@
 #' gearPlotHH.wgdo Door Spread vs. WingSpread
-#' 
-#' Plots Door Spread vs. Wing Spread behaviour and produces a model using lm. If there are DoorSpread and WingSpread values.  
+#'
+#' Plots Door Spread vs. Wing Spread behaviour and produces a model using lm. If there are DoorSpread and WingSpread values.
 #' If there are two different sweeps in the data, produces a model for each sweep length.
 #' @param getICES: Should the data be downloaded from DATRAS? If T, default, the data are taken from DATRAS through the icesDatras package.
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param country: The country chosen to be plotted (checks if it's available in the HH file)
@@ -14,8 +14,11 @@
 #' @param ti: if T includes autmoatically the title, F leaves it blank an can be added later.
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a graph with DoorSpread vs. WingSpread, it also includes information on the ship, the time series used, the models and parameters estimated.
-#' @examples gearPlotHHNS.wgdo("NS-IBTS",c(2016:2017),1,"SWE")
-#' @examples gearPlotHHNS.wgdo("NS-IBTS",c(2015:2017),1,"SWE")
+#' @examples
+#' \dontrun{
+#' gearPlotHHNS.wgdo("NS-IBTS",c(2016:2017),1,"SWE")
+#' gearPlotHHNS.wgdo("NS-IBTS",c(2015:2017),1,"SWE")
+#' }
 #' @export
 gearPlotHHNS.wgdo<-function(Survey="NS-IBTS",years,quarter,country,col1="darkblue",col2="steelblue2",getICES=T,pF=T) {
   if (getICES) {
@@ -83,7 +86,7 @@ gearPlotHHNS.wgdo<-function(Survey="NS-IBTS",years,quarter,country,col1="darkblu
             dslong<-data.frame(DoorSpread=seq(dsprlng[1],dsprlng[2],length.out = 10))
             predlong <- predict(lm.WingVsDoor.long, newdata = dslong)
             lines(predlong~dslong$DoorSpread,col=col1,lty=1,lwd=2)
-            legend("bottomleft",legend=substitute(paste(WSshort == a + b %*% DSshort),list(a=round(coef(lm.WingVsDoor.short)[1],2),b=(round(coef(lm.WingVsDoor.short)[2],2)))),inset=c(.09,.1),bty="n",text.font=2,text.col=col1) 
+            legend("bottomleft",legend=substitute(paste(WSshort == a + b %*% DSshort),list(a=round(coef(lm.WingVsDoor.short)[1],2),b=(round(coef(lm.WingVsDoor.short)[2],2)))),inset=c(.09,.1),bty="n",text.font=2,text.col=col1)
             legend("bottomleft",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WingVsDoor.short)$adj.r.squared,2))),inset=c(.17,.04),cex=.9,bty="n",text.col=col1)
             legend("topright",legend=substitute(paste(WSlong == a + b %*% DSlong),list(a=round(coef(lm.WingVsDoor.long)[1],2),b=(round(coef(lm.WingVsDoor.long)[2],2)))),bty="n",text.font=2,inset=.05,text.col=col1)
             legend("topright",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WingVsDoor.long)$adj.r.squared,2))),inset=c(.15,.12),cex=.9,bty="n",text.col=col1)

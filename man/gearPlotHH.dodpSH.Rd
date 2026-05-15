@@ -28,13 +28,13 @@ gearPlotHH.dodpSH(
 
 \item{quarter:}{the quarter of the survey to be plotted}
 
-\item{c.int:}{the confidenc interval to be used in the confint function}
+\item{c.int:}{the confidence interval to be used in the confint function}
 
 \item{c.inta:}{the confidence interval to be used in the confint function for all data if only one sweep length, and for the short sweeps in case there are two}
 
 \item{c.intb:}{the confidence interval to be used in the confint function for the long set of sweeps.}
 
-\item{es:}{si T titulos y leyendas salen en espa\u00f1ol, si no en ingl\u00e9s.}
+\item{es:}{if T titles and legend are in Spanish, if F in English}
 
 \item{col1:}{color for the symbols and lines for the whole set if only one set of sweeps are used, and for the data from the long set of sweeps.}
 

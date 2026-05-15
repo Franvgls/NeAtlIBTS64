@@ -1,9 +1,9 @@
 #' Function gearPlotHHNS.dodp Door Spread versus Depth for a concrete country within the NS-IBTS survey
-#' 
+#'
 #' Produces a DoorSpread vs. Depth plot and model with nls R function. Data are taken directly from DATRAS using function getHHdata from library(icesDatras)
 #' it only produces plots for surveys with HH files uploaded in DATRAS
 #' If there are two different sweeps in the data, produces a model for each sweep length.
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be plotted
 #' @param country: The country chosen to be plotted (checks if it's available in the HH file)
@@ -16,7 +16,10 @@
 #' @param pF: takes out the points and leaves only the lines in the graphs
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a graph DoorSpread vs. Depth, it also includes information on the ship, the time series used, the models and parameters estimated.
-#' @examples gearPlotHHNS.dodp("NS-IBTS",c(2014:2017),3,"SCO",.8,.3,col1="darkblue",col2="darkgreen")
+#' @examples
+#' \dontrun{
+#' gearPlotHHNS.dodp("NS-IBTS",c(2014:2017),3,"SCO",.8,.3,col1="darkblue",col2="darkgreen")
+#' }
 #' @export
 gearPlotHHNS.dodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.intb=.3,col1="darkblue",col2="steelblue2",getICES=T,pF=T) {
   if (getICES) {

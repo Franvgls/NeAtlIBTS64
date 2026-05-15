@@ -1,10 +1,10 @@
 #' Function gearPlotHHN21.dodp Door Spread versus Depth N21 Spanish North with two vessels
-#' 
+#'
 #' Produces a DoorSpread vs. Depth plot and model with nls R function. Data are taken directly from DATRAS using function getDATRAS from library(icesDatras)
 #' it only produces plots for surveys with HH files uploaded in DATRAS
 #' If there are two different sweeps in the data, produces a model for each sweep length.
-#' @param getICES: Should the data be downloaded from DATRAS? If T, default, the data are taken from DATRAS through the icesDatras package.				   
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param getICES: Should the data be downloaded from DATRAS? If T, default, the data are taken from DATRAS through the icesDatras package.
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be plotted
 #' @param c.int: the confidence interval to be used in the confint function
@@ -16,7 +16,10 @@
 #' @param ti: if F title will not be included automatically and can be addedd later
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a graph DoorSpread vs. Depth, it also includes information on the ship, the time series used, the models and parameters estimated.
-#' @examples gearPlotHHN21.dodp("SP-NORTH",c(2021),3,.8,.3,col1="darkblue",col2="red")
+#' @examples
+#' \dontrun{
+#' gearPlotHHN21.dodp("SP-NORTH",c(2021),3,.8,.3,col1="darkblue",col2="red")
+#' }
 #' @export
 gearPlotHHN21.dodp<-function(Survey="SP-NORTH",years=2021,quarter=4,c.int=.95,c.inta=.95,c.intb=.95,es=FALSE,col1="darkblue",col2="red",getICES=TRUE,pF=TRUE,ti=TRUE) {
   if (getICES) {
@@ -35,7 +38,7 @@ gearPlotHHN21.dodp<-function(Survey="SP-NORTH",years=2021,quarter=4,c.int=.95,c.
     dp<-seq(dpthA[1],dpthA[2]+20,length=650)
     plot(DoorSpread~Depth,dumb,type="n",xlim=c(0,dpthA[2]+20),ylim=c(0,dspr[2]+40),pch=21,col=col1,ylab=ifelse(es,"Abertura puertas (m)","Door spread (m)"),xlab=ifelse(es,"Profundidad (m)","Depth (m)"),subset=DoorSpread!=c(-9)& Year!=years[length(years)])
     if (pF & length(levels(dumb$sweeplngt))==1) {
-      points(DoorSpread~Depth,dumb,pch=21,bg=col1,subset=c(Ship=="29MO"))         
+      points(DoorSpread~Depth,dumb,pch=21,bg=col1,subset=c(Ship=="29MO"))
       points(DoorSpread~Depth,dumb,subset=c(Ship=="29VE"),pch=21,bg=col2)
       if (length(years)==1) legend("bottomright",legend=as.character(c(years)),pch=21,col=col1,pt.bg=col1,bty="n",inset=.04)
       else legend("bottomright",c(paste0(years[1],"-",years[length(years)-1]),years[length(years)]),pch=c(1,21),col=c(col1),pt.bg=c(NA,col1),bty="n",inset=.02)
@@ -79,7 +82,7 @@ gearPlotHHN21.dodp<-function(Survey="SP-NORTH",years=2021,quarter=4,c.int=.95,c.
       points(DoorSpread~Depth,dumbvde,subset=Year==years[length(years)],pch=21,bg=col2)
     }
   }
-  
+
   dspr<-range(subset(dumbmol$DoorSpread,dumbmol$DoorSpread>c(-9)))
   if (pF) {
   }

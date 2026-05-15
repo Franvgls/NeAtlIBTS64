@@ -17,13 +17,17 @@
 #' @details Surveys available in DATRAS recent years and not discontinued: EVHOE, FR-CGFS,
 #' FR-WCGFS, IE-IAMS, IE-IGFS, NIGFS, NS-IBTS, PT-IBTS, SCOROC, SCOWCGFS, SP-ARSA, SP-NORTH, SP-PORC
 #' @return during the calculations shows the types of data in the file "C", "P", "R", And the species of the set present in the Survey/year
-#' @examples MapLengths("SP-NORTH",2024,4,esp="HKE",tmin=0,tmax=20,zeros=T,add=F)
-#' @examples MapLengths("NS-IBTS",2023,3,esp="MEG",tmin=20,tmax=50,zeros=T,add=F)
-#' @examples NeAtlIBTS64::IBTSNeAtl_map64(load=F,leg=F,xlims=c(-16,13),bw=T);MapLengths("NS-IBTS",2023,3,esp="HKE",tmin=0,tmax=21,zeros=T,add=T)
+#' @examples
+#' \dontrun{
+#' MapLengths("SP-NORTH", 2024, 4, esp="HKE", tmin=0, tmax=20, zeros=TRUE, add=FALSE)
+#' MapLengths("NS-IBTS", 2023, 3, esp="MEG", tmin=20, tmax=50, zeros=TRUE, add=FALSE)
+#'
+#' NeAtlIBTS64::IBTSNeAtl_map64(load=FALSE, leg=FALSE, xlims=c(-16,13), bw=TRUE)
+#' MapLengths("NS-IBTS", 2023, 3, esp="HKE", tmin=0, tmax=21, zeros=TRUE, add=TRUE)
+#' }
 #' @export
 #setwd("D:/FVG/Campanas/IBTS/IBTS_2024/mapping/DATOS")
 MapLengths<-function(esp,dtSurv,dtyear,dtq,tmin,tmax,add=FALSE,ti=TRUE,subti=TRUE,leg=TRUE,colo="red",bw=FALSE,save.dat=FALSE,out.dat=FALSE,zeros=FALSE,onlyVal=F,cexleg=1,escmult=1,escCPUE=NA) {
-  library(dplyr)
   worms<-SpeciesCodes[SpeciesCodes$Code==esp,"WoRMSCode"]
   dat.HH<-icesDatras::getHHdata(dtSurv,dtyear,dtq)
   dat.HL<-dplyr::filter(icesDatras::getHLdata(dtSurv,dtyear,dtq),Valid_Aphia==worms)
@@ -70,11 +74,11 @@ MapLengths<-function(esp,dtSurv,dtyear,dtq,tmin,tmax,add=FALSE,ti=TRUE,subti=TRU
           if (tmin==0 & tmax==999) sub<-NA
           mtext(sub,side=1,line=2,font=2,cex=.9*cexleg)
         }
-    if (is.na(escCPUE)) {points(ShootLat~ShootLong,toplot,cex=sqrt(toplot$CPUE/(.1*hablar::max_(toplot$CPUE)))*escmult,pch=21,col="black",bg=colo,lwd=1)}
+    if (is.na(escCPUE)) {points(ShootLat~ShootLong,toplot,cex=sqrt(toplot$CPUE/(.1*max(toplot$CPUE,na.rm=TRUE)))*escmult,pch=21,col="black",bg=colo,lwd=1)}
     else {points(ShootLat~ShootLong,toplot,cex=sqrt(toplot$CPUE/(.1*escCPUE))*escmult,pch=21,col="black",bg=colo,lwd=1)}
   if (zeros)  points(ShootLat~ShootLong,filter(dat.HH,!HaulNo %in%toplot$HaulNo),pch=4,cex=1,col="black",lwd=2)
-  if (leg) legend("bottomright",legend=round(fivenum(toplot$CPUE)[c(3:5)],0),pt.cex=sqrt(fivenum(toplot$CPUE)[c(3:5)]/(.1*hablar::max_(toplot$CPUE)))*escmult,inset=.02,pch=21,pt.bg="red",bg="white")
-  if (out.dat) list(data=toplot,maxCPUE=hablar::max_(toplot$CPUE))
+  if (leg) legend("bottomright",legend=round(fivenum(toplot$CPUE)[c(3:5)],0),pt.cex=sqrt(fivenum(toplot$CPUE)[c(3:5)]/(.1*max(toplot$CPUE,na.rm=TRUE)))*escmult,inset=.02,pch=21,pt.bg="red",bg="white")
+  if (out.dat) list(data=toplot,maxCPUE=max(toplot$CPUE,na.rm=TRUE))
 }
 # #    if (out.dat)  write.csv(dataIBTS.dat,paste0("IBTSdata",datSurvey,substr(dtyear,3,4),"Q",dtq,".csv"),row.names=F)
 # }

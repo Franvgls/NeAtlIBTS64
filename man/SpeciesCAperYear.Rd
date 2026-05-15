@@ -2,23 +2,70 @@
 % Please edit documentation in R/SpeciesCAperYear.R
 \name{SpeciesCAperYear}
 \alias{SpeciesCAperYear}
-\title{Function SpeciesCAperYear Takes a CA file for one survey and produces a table with number of biological samples per year and species}
+\title{Function SpeciesCAperYear
+Summary of biological samples from DATRAS CA records for one survey.}
 \usage{
-SpeciesCAperYear(Survey, years, quarter)
+SpeciesCAperYear(
+  Survey,
+  year,
+  quarter,
+  esp = NULL,
+  out = c("summary", "matrix"),
+  sort_by = c("aged", "name", "n", "none")
+)
 }
 \arguments{
-\item{Survey:}{Surveys available in DATRAS see details}
+\item{Survey}{Survey available in DATRAS (see details)}
 
-\item{years:}{years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in yellow, it depends on the order of years, not the actual chronological year.}
+\item{year}{Year(s) to download from DATRAS}
 
-\item{quarter:}{the quarter of the survey to be ploted}
+\item{quarter}{Quarter of the survey}
+
+\item{esp}{Optional: scientific name or AphiaID to restrict to a single
+species. If supplied, output is a length(cm) x sex matrix of numbers
+at length (CANoAtLngt) for that species.}
+
+\item{out}{Output type when \code{esp} is NULL:
+\itemize{
+\item \code{"summary"} (default): data.frame with one row per species
+and columns \code{Name, Aphia, N_total, N_aged, pct_aged, Lmin,
+      Lmax, Amin, Amax, M, F, U}.
+\item \code{"matrix"}: species x sex matrix of CA record counts
+(legacy behaviour).
+}}
+
+\item{sort_by}{When \code{out = "summary"}, how to order rows:
+\code{"aged"} (descending by N_aged), \code{"name"} alphabetical,
+\code{"n"} (descending by N_total), or \code{"none"}.}
+}
+\value{
+A data.frame. Format depends on \code{esp} and \code{out}.
 }
 \description{
-Function SpeciesCAperYear Takes a CA file for one survey and produces a table with number of biological samples per year and species
+Default output is a per-species summary including how many records
+have age readings, length range and age range. Useful to explore which
+species have biological data and ALK data available in a given
+survey-year-quarter combination.
 }
 \details{
-Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
+Surveys available in DATRAS: EVHOE, FR-CGFS, FR-WCGFS, IE-IAMS,
+IE-IGFS, NIGFS, NS-IBTS, PT-IBTS, ROCKALL, SCOROC, SCOWCGFS, SP-ARSA,
+SP-NORTH, SP-PORC, SWC-IBTS.
 }
 \examples{
-SpeciesCAperYear("SP-NORTH",c(2014:2016),4)
+\dontrun{
+# Resumen completo, ordenado por especies con más otolitos leídos
+SpeciesCAperYear("SP-NORTH", 2024, 4)
+
+# Solo especies con edades disponibles
+x <- SpeciesCAperYear("SP-NORTH", 2024, 4)
+x[x$N_aged > 0, ]
+
+# Matriz especie x sexo (comportamiento legacy)
+SpeciesCAperYear("SP-NORTH", 2024, 4, out = "matrix")
+
+# Distribución de tallas para una especie
+SpeciesCAperYear("SP-NORTH", 2024, 4, esp = "Merluccius merluccius")
+SpeciesCAperYear("SP-NORTH", 2024, 4, esp = 126484)
+}
 }

@@ -1,13 +1,13 @@
 #' Function gearPlotHH.wrpdpSH plots warp length vs. Depth behaviour  for shiny app
-#' 
+#'
 #' Produces a warplength vs. DoorSpread plot and a model with lm unction. Data are taken directly from DATRAS using function getDATRAS from library(icesDatras)
 #' It only produces plots for surveys with HH files uploaded in DATRAS
 #' Since sweeps length does not affect the warp that is decided by the chief scientist, there are no differences depending on sweeps
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param line: includes a regression line between Warp and depth and the formula of the linear regression. If F the line is omited
-#' @param c.inta: the confidence interval to be used in the predict.lm function 
+#' @param c.inta: the confidence interval to be used in the predict.lm function
 #' @param es: if TRUE all labels axes and legends are in Spanish, if FALSE in English
 #' @param col1: the color of the points, last year fill and previous years empty symbol
 #' @param esc.mult changes size of texts in graphs
@@ -17,8 +17,11 @@
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a graph Warp length vs. Depth for the years selected.
 #, it also includes information on the ship, the time series used the model used and parameters estimated.
-#' @examples gearPlotHH.wrpdp("SWC-IBTS",c(2011:2016),1,c.inta=.95,col1="darkblue",pF=F)
-#' @examples gearPlotHH.wrpdp(damb,c(2014:2016),4,getICES=F,pF=F)
+#' @examples
+#' \dontrun{
+#' gearPlotHH.wrpdp("SWC-IBTS",c(2011:2016),1,c.inta=.95,col1="darkblue",pF=F)
+#' gearPlotHH.wrpdp(damb,c(2014:2016),4,getICES=F,pF=F)
+#' }
 #' @export
 gearPlotHH.wrpdpSH<-function(Survey,years,quarter,incl2=TRUE,line=TRUE,c.inta=.95,es=FALSE,col1="darkblue",esc.mult=1,getICES=TRUE,pF=TRUE,ti=TRUE) {
   if (getICES) {
@@ -42,7 +45,7 @@ gearPlotHH.wrpdpSH<-function(Survey,years,quarter,incl2=TRUE,line=TRUE,c.inta=.9
      mtext(dumb$Ship[1],line=.4,cex=.8*esc.mult,adj=0)
      if (line) {
        if (length(years)>1) {lm.WarpVsDepth<-lm(Warplngt~Depth,dumb,subset=HaulVal=="V" & Warplngt > c(0) & Depth> c(0))}
-       else lm.WarpVsDepth<-lm(Warplngt~Depth,dumb,subset=Warplngt > c(0) & Depth> c(0)) 
+       else lm.WarpVsDepth<-lm(Warplngt~Depth,dumb,subset=Warplngt > c(0) & Depth> c(0))
        dpt<-data.frame(Depth=seq(dpthA[1],dpthA[2],length.out = 100))
        pred.plim<-predict(lm.WarpVsDepth,newdata=dpt,interval="prediction",level=c.inta)
        pred.clim<-predict(lm.WarpVsDepth,newdata=dpt,interval="confidence",level=c.inta)
@@ -73,6 +76,6 @@ gearPlotHH.wrpdpSH<-function(Survey,years,quarter,incl2=TRUE,line=TRUE,c.inta=.9
     mtext(ifelse(es,"Sin datos de cable","No Data for Warp Length"),font=2,cex=.8*esc.mult,line=.2)
   }
 }
-   
-   
+
+
 

@@ -1,9 +1,9 @@
 #' Function gearPlotHHN21.wgdp plots Wing Spread vs. Depth for N21
-#' 
+#'
 #' Produces a WingSpread vs. DoorSpread plot and a model with nls R function. Data are taken directly from DATRAS using function getDATRAS from library(icesDatras)
 #' It only produces plots for surveys with HH files uploaded in DATRAS
 #' If there are two different sweeps in the data, produces a model for each sweep length.
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param c.inta: the confidence interval to be used in the confint function for long sweeps and for sweeps if there is only one length
@@ -16,18 +16,11 @@
 #' @param ti: if F title will not be included automatically and can be addedd later
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a graph with WingSpread vs. Depth. it also includes information on the ship, the time series used, the models and parameters estimated.
-#' @examples gearPlotHH.wgdp("SWC-IBTS",c(2014:2016),1,.6,.2,col1="darkblue",col2="steelblue")
-#' @examples gearPlotHH.wgdp("SWC-IBTS",c(2013:2016),4,.6,.2)
-#' @examples gearPlotHH.wgdp("ROCKALL",c(2013:2016),3,.8)
-#' @examples gearPlotHH.wgdp("NIGFS",c(2005:2016),1,.2)
-#' @examples gearPlotHH.wgdp("IE-IGFS",c(2005:2016),4,.9,.8,pF=F)
-#' @examples gearPlotHH.wgdp("SP-PORC",c(2015:2016),3,.5)
-#' @examples gearPlotHH.wgdp("FR-CGFS",c(1998:2016),4,.8)
-#' @examples gearPlotHH.wgdp("EVHOE",c(1997:2016),4,.9)
-#' @examples gearPlotHH.wgdp("SP-NORTH",c(2014:2016),4,.3,col1="darkblue")
-#' @examples gearPlotHH.wgdp("SP-ARSA",c(2014:2016),1,.2)
-#' @examples gearPlotHH.wgdp("SP-ARSA",c(2014:2016),4,.5)
-#' @examples gearPlotHH.wgdp(damb,c(2014:2016),4,pF=F,getICES=F)
+#' @examples
+#' \dontrun{
+#' gearPlotHH.wgdp("SWC-IBTS",c(2014:2016),1,.6,.2,col1="darkblue",col2="steelblue")
+#' gearPlotHH.wgdp(damb,c(2014:2016),4,pF=F,getICES=F)
+#' }
 #' @export
 gearPlotHHN21.wgdp<-function(Survey="SP-NORTH",years=2021,quarter=4,incl2=T,c.inta=.8,c.intb=.3,es=FALSE,col1="darkblue",col2="red",getICES=TRUE,pF=TRUE,ti=TRUE) {
   if (getICES) {
@@ -56,7 +49,7 @@ gearPlotHHN21.wgdp<-function(Survey="SP-NORTH",years=2021,quarter=4,incl2=T,c.in
       if (pF) {
         points(WingSpread~Depth,dumb,xlim=c(0,dpthA[2]+20),subset=WingSpread!=c(-9) & WingSpread>0,pch=21,col=col1)
         #legend("bottomright",legend=as.character(c(years)),pch=21,col=col1,pt.bg=col1,bty="n",inset=.04)
-      } 
+      }
     }
     if (ti) title(main=paste0(ifelse(es,"Abertura calones vs. profundidad en ","Wing Spread vs. Depth in "),dumb$Survey[1],".Q",quarter),line=2.5)
     # if (length(levels(factor(dumb$sweeplngt)))<2) {
@@ -102,8 +95,8 @@ gearPlotHHN21.wgdp<-function(Survey="SP-NORTH",years=2021,quarter=4,incl2=T,c.in
       }
       if (pF) {
         points(WingSpread~Depth,dumbmol,subset=HaulVal=="V",pch=21,col=col2)
-        points(WingSpread~Depth,dumbvde,subset=HaulVal=="V",pch=21,col=col1)            
-        if (length(years)>1) legend("bottomright",c(paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c("mol sweeps"),sep=" "),paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c("29VE"),sep=" ")),pch=21,col=c(col2,col1,col1,col1),pt.bg=c(NA,col2,NA,col1),bty="n",inset=c(.02),ncol=2)           
+        points(WingSpread~Depth,dumbvde,subset=HaulVal=="V",pch=21,col=col1)
+        if (length(years)>1) legend("bottomright",c(paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c("mol sweeps"),sep=" "),paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c("29VE"),sep=" ")),pch=21,col=c(col2,col1,col1,col1),pt.bg=c(NA,col2,NA,col1),bty="n",inset=c(.02),ncol=2)
         else legend("bottomright",c("28MO","29VE"),pch=21,col=c(col1,col1),pt.bg = c(col2,col1),bty="n",inset=.04)
       }
       if (ti) title(main=paste0(ifelse(es,"Abertura calones vs. profundidad en ","Wing Spread vs. Depth in "),dumb$Survey[1],".Q",quarter),line=2.5)

@@ -1,10 +1,10 @@
 #' Function gearPlotHH.nodp to plot net opening vs. depth for the Spanish N21 Survey
-#' 
-#'  
+#'
+#'
 #' Produces Net Vertical opening vs. Depth plot and a model with nls R function. Data are taken directly from DATRAS getting all the data from DATRAS using function getDATRAS from library(icesDatras)
 #' it only produces plots for surveys with HH files uploaded in DATRAS
 #' If there are two different sweeps in the data, produces a model for each sweep length.
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param c.inta: the confidence interval to be used in the confint function for all data if only one sweep length, and for the short sweeps in case there are two
@@ -17,21 +17,12 @@
 #' @param ti: if F title will not be included automatically and can be addedd later
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces Net Vertical opening vs. Depth plot it also includes information on the ship, the time series used (bottom fourth graph), the models and parameters estimated.
-#' @examples gearPlotHH.nodp("SWC-IBTS",c(2014:2016),1,.07,.5,col1="darkblue",col2="steelblue2")
-#' @examples gearPlotHH.nodp("SWC-IBTS",c(2014:2016),1,.07,.5,col1="darkblue",col2="steelblue2",pF=F)
-#' @examples gearPlotHH.nodp("SWC-IBTS",c(2013:2016),4)
-#' @examples gearPlotHH.nodp("ROCKALL",c(2013:2016),3)
-#' @examples gearPlotHH.nodp("NIGFS",c(2005:2016),1)
-#' @examples gearPlotHH.nodp("NIGFS",c(2006:2007,2009:2016),4)
-#' @examples gearPlotHH.nodp("IE-IGFS",c(2011:2016),4,.8)
-#' @examples gearPlotHH.nodp("SP-PORC",c(2010:2016),3)
-#' @examples gearPlotHH.nodp("FR-CGFS",c(2014:2016),4)
-#' @examples gearPlotHH.nodp("EVHOE",c(1997:2015),4)
-#' @examples gearPlotHH.nodp("SP-NORTH",c(2014:2016),4,col1="darkblue",col2="yellow")
-#' @examples gearPlotHH.nodp("SP-ARSA",c(2014:2016),1)
-#' @examples gearPlotHH.nodp("SP-ARSA",c(2014:2016),4)
-#' @examples gearPlotHH.nodp(getICES=F,damb,c(2014:2016),4,pF=F)
-#' @examples gearPlotHH.nodp(getICES=F,Survey=damb,years=c(2014:2016),quarter=4,pF=F)
+#' @examples
+#' \dontrun{
+#' gearPlotHH.nodp("SWC-IBTS",c(2014:2016),1,.07,.5,col1="darkblue",col2="steelblue2")
+#' gearPlotHH.nodp("SWC-IBTS",c(2014:2016),1,.07,.5,col1="darkblue",col2="steelblue2",pF=F)
+#' gearPlotHH.nodp(getICES=F,Survey=damb,years=c(2014:2016),quarter=4,pF=F)
+#' }
 #' @export
 gearPlotHHN21.nodp<-function(Survey="SP-NORTH",years=2021,quarter=4,c.inta=.8,c.intb=.3,es=FALSE,col1="darkblue",col2="red",incl2=TRUE,getICES=TRUE,pF=TRUE,ti=TRUE) {
   if (getICES) {
@@ -50,7 +41,7 @@ gearPlotHHN21.nodp<-function(Survey="SP-NORTH",years=2021,quarter=4,c.inta=.8,c.
       vrt<-range(subset(dumb$Netopening,dumb$Netopening> c(0)))
       plot(Netopening~Depth,dumb,xlim=c(0,dpthA[2]+20),ylim=c(0,vrt[2]+2),type="n",pch=21,col=col1,
          ylab=ifelse(es,"Abertura vertical (m)","Vertical opening (m)"),xlab=ifelse(es,"Profundidad (m)","Depth (m)"),subset=Year!=years[length(years)] & Netopening> c(-9))
-          if (pF) points(Netopening~Depth,dumb,pch=21,col=col1,subset=Year!=years[length(years)] & Netopening> c(-9))    
+          if (pF) points(Netopening~Depth,dumb,pch=21,col=col1,subset=Year!=years[length(years)] & Netopening> c(-9))
           # if (length(levels(dumb$sweeplngt))<2) {
           #   dp<-seq(dpthA[1],dpthA[2]+20,length=650)
           #   if (length(years)>1) {Netopening.log<-nls(Netopening~a1+b1*log(Depth),dumb,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(0) & Year!= years[length(years)])}
@@ -68,7 +59,7 @@ gearPlotHHN21.nodp<-function(Survey="SP-NORTH",years=2021,quarter=4,c.inta=.8,c.
           #   lines(dp,a1Upr+b1Upr*log(dp),col=col1,lty=2,lwd=1)
           #   if (pF) {
           #     points(Netopening~Depth,dumb,subset=Year==years[length(years)],pch=21,bg=col1,lwd=1)
-          #     if (length(years)>1) legend("bottomright",c(paste0(years[1],"-",years[length(years)-1]),years[length(years)]),pch=c(1,21),col=c(col1),pt.bg=c(NA,col1),bty="n",inset=.02)              
+          #     if (length(years)>1) legend("bottomright",c(paste0(years[1],"-",years[length(years)-1]),years[length(years)]),pch=c(1,21),col=c(col1),pt.bg=c(NA,col1),bty="n",inset=.02)
           #     else legend("bottomright",as.character(years),pch=21,col=col1,pt.bg=col1,bty="n",inset=.02)
           #     }
           #   legend("topright",legend=substitute(NetOpening == a1 + b1 %*% log(depth),list(a1=round(coef(Netopening.log)[1],2),b1=(round(coef(Netopening.log)[2],2)))),bty="n",text.font=2,inset=.05)
@@ -93,11 +84,11 @@ gearPlotHHN21.nodp<-function(Survey="SP-NORTH",years=2021,quarter=4,c.inta=.8,c.
            vrtmol<-range(subset(dumbmol$Netopening,dumbmol$Netopening> c(-9)))
            vrtvde<-range(subset(dumbvde$Netopening,dumbvde$Netopening> c(-9)))
            if (pF) {
-              points(Netopening~Depth,dumbmol,subset=HaulVal=="V",pch=21,col=col1)   
-              points(Netopening~Depth,dumbmol,subset=Year==years[length(years)],pch=21,bg=col1,lwd=1)   
-              points(Netopening~Depth,dumbvde,subset=HaulVal=="V",pch=21,col=col2)   
-              points(Netopening~Depth,dumbvde,subset=Year==years[length(years)],pch=21,bg=col2,lwd=1)   
-              if (length(years)>1) legend("bottomright",c(paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c("29MO"),sep=" "),paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c("29VE"),sep=" ")),pch=21,col=c(col2,col2,col1,col1),pt.bg=c(NA,col2,NA,col1),bty="n",inset=c(.02),ncol=2)           
+              points(Netopening~Depth,dumbmol,subset=HaulVal=="V",pch=21,col=col1)
+              points(Netopening~Depth,dumbmol,subset=Year==years[length(years)],pch=21,bg=col1,lwd=1)
+              points(Netopening~Depth,dumbvde,subset=HaulVal=="V",pch=21,col=col2)
+              points(Netopening~Depth,dumbvde,subset=Year==years[length(years)],pch=21,bg=col2,lwd=1)
+              if (length(years)>1) legend("bottomright",c(paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c("29MO"),sep=" "),paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c("29VE"),sep=" ")),pch=21,col=c(col2,col2,col1,col1),pt.bg=c(NA,col2,NA,col1),bty="n",inset=c(.02),ncol=2)
               else {
                 legend("bottomright",legend=c("28MO","29VE"),pch=21,col=c(col1,col1),pt.bg=c(col1,col2),inset=.04,bty="n")
                 }
@@ -136,4 +127,4 @@ gearPlotHHN21.nodp<-function(Survey="SP-NORTH",years=2021,quarter=4,c.inta=.8,c.
   else txt<-paste0(ifelse(es,"A\u00f1o: ","Year: "),as.character(years))
   mtext(txt,1,line=-1.1,adj=0.01, font=1, cex=.9)
   }
-            
+

@@ -19,7 +19,10 @@
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a map with segments of the hauls performed in that survey.
 #, it also includes information on the ship, the time series used the model used and parameters estimated.
-#' @examples gearPlotdumb.wrpdp("NS-IBTS",c(2014:2017),1,"SWE")
+#' @examples
+#' \dontrun{
+#' gearPlotdumb.wrpdp("NS-IBTS",c(2014:2017),1,"SWE")
+#' }
 #' @export
 qcHaulsPosit<-function(Survey="NS-IBTS",years,quarter,col1="red",ti=TRUE,Hpoints=FALSE,Nhauls=FALSE,getICES=TRUE,esc.mult=1,graf=FALSE,xpng=800,ypng=800,ppng=15) {
   if (getICES) {

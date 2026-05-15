@@ -1,5 +1,5 @@
 #' Function SplitLengths extracts from DATRAS the data to produce the IBTS maps with two length ranges for a fix set of species see file SpeciesCodes.csv
-#' @param datSurvey: The Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param datSurvey: The Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param dtyear: year to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in yellow, it depends on the order of years, not the actual chronological year.
 #' @param dtq: the quarter of the survey to be downloaded
 #' @param esp: species to be included in the resulting map if plot=True
@@ -9,11 +9,13 @@
 #' @param save.dat: by default set to FALSE, if TRUE saves the data in a file: IBTSdataSURVEYyrQX.csv
 #' @param out.dat: by default set to FALSE, if TRUE gives the data as output of the function
 #' @param zeros: if TRUE the map includes small points with the hauls with out catch of the species
-#' @details Surveys available in DATRAS recent years and not discontinued: EVHOE, FR-CGFS, 
+#' @details Surveys available in DATRAS recent years and not discontinued: EVHOE, FR-CGFS,
 #' FR-WCGFS, IE-IAMS, IE-IGFS, NIGFS, NS-IBTS, PT-IBTS, SCOROC, SCOWCGFS, SP-ARSA, SP-NORTH, SP-PORC
 #' @return during the calculations shows the types of data in the file "C", "P", "R", And the species of the set present in the Survey/year
+#' \dontrun{
 #' @examples SplitLengths("NS-IBTS",2023,3,esp="HKE",zeros=T)
 #' @examples SplitLengths("NS-IBTS",2023,3,esp="MEG",zeros=T)
+#' }
 #' @export
 #setwd("D:/FVG/Campanas/IBTS/IBTS_2024/mapping/DATOS")
 SplitLengths<-function(datSurvey,dtyear,dtq,adj=FALSE,esp="HKE",plot=TRUE,ti=TRUE,save.dat=FALSE,out.dat=FALSE,zeros=FALSE) {
@@ -117,16 +119,16 @@ SplitLengths<-function(datSurvey,dtyear,dtq,adj=FALSE,esp="HKE",plot=TRUE,ti=TRU
     if (plot) {
     IBTSNeAtl_map(load=F,leg=F,dens=0,nl=max(dataIBTS.dat$ShootLat)+.5,sl=min(dataIBTS.dat$ShootLat)-.5,xlims=c(min(dataIBTS.dat$ShootLong)-1,1+ifelse(max(dataIBTS.dat$ShootLong)>-8,max(dataIBTS.dat$ShootLong),-8)))
     if (ti) title(main=SpeciesCodes[match(esp,SpeciesCodes$Code),"Scientific"],font.main=4,line=1.5)
-    if (zeros)  points(ShootLat~ShootLong,dat.HH,pch=20,cex=.8,col="black")  
+    if (zeros)  points(ShootLat~ShootLong,dat.HH,pch=20,cex=.8,col="black")
     if (!is.na(SpeciesCodes[match(esp,SpeciesCodes$Code),"LengthSplit"])) {
-	     points(ShootLat~ShootLong,dataIBTS.dat,cex=sqrt(dataIBTS.dat[,"Small"]/(.1*hablar::max_(dataIBTS.dat[dataIBTS.dat$SpeciesCode==esp,"Small"]))),subset=SpeciesCode==esp,pch=21,col="red",lwd=2)
-	     points(ShootLat~ShootLong,dataIBTS.dat,cex=sqrt(dataIBTS.dat[,"Large"]/(.1*hablar::max_(dataIBTS.dat[dataIBTS.dat$SpeciesCode==esp,"Large"]))),subset=SpeciesCode==esp,pch=21,col="blue",lwd=2)
+	     points(ShootLat~ShootLong,dataIBTS.dat,cex=sqrt(dataIBTS.dat[,"Small"]/(.1*max(dataIBTS.dat[dataIBTS.dat$SpeciesCode==esp,"Small"],na.rm=TRUE))),subset=SpeciesCode==esp,pch=21,col="red",lwd=2)
+	     points(ShootLat~ShootLong,dataIBTS.dat,cex=sqrt(dataIBTS.dat[,"Large"]/(.1*max(dataIBTS.dat[dataIBTS.dat$SpeciesCode==esp,"Large"],na.rm=TRUE))),subset=SpeciesCode==esp,pch=21,col="blue",lwd=2)
 	     if(zeros) {legend("bottomright",c("Large","Small","No Catch"),pch=c(21,21,20),
             col=c("blue","red","black"),inset=.1,bg="white",pt.lwd = 2,pt.cex = c(1.2,1.2,.8))}
 	     else legend("bottomright",c("Large","Small"),pch=c(21,21),col=c("blue","red"),inset=.1,bg="white",pt.lwd = 2,pt.cex =1.2)
 	     }
     else {
-      points(ShootLat~ShootLong,dataIBTS.dat,cex=sqrt(dataIBTS.dat[,"Total"]/(.1*hablar::max_(dataIBTS.dat[dataIBTS.dat$SpeciesCode==esp,"Total"]))),subset=SpeciesCode==esp,pch=21,bg="blue",lwd=1)
+      points(ShootLat~ShootLong,dataIBTS.dat,cex=sqrt(dataIBTS.dat[,"Total"]/(.1*max(dataIBTS.dat[dataIBTS.dat$SpeciesCode==esp,"Total"],na.rm=TRUE))),subset=SpeciesCode==esp,pch=21,bg="blue",lwd=1)
       legend("bottomright",c(paste(esp,"Catches")),pch=21,pt.bg=c("blue"),inset=.1,bg="white",pt.lwd = 2,pt.cex = 1.2)
       }
     }

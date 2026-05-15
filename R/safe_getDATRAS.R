@@ -1,39 +1,53 @@
-#' Function safe_getDATRAS gets data from DATRAS and shows original messages to the users but inside R and shiny
-#' 
-#' Downloads data from DATRAS or sends its errors
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
-#' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
-#' @param quarter: the quarter of the survey to be ploted
-#' @param context: evaluates if running within a normal script or within shiny app
+#' Wrap icesDatras::getDATRAS with friendly errors
+#'
+#' Downloads data from DATRAS and handles missing data gracefully, both from
+#' the console (stop with a helpful message) and from Shiny (validate+need).
+#' `shiny` is only required when `context = "shiny"`; it is listed as Suggests.
+#'
+#' @param datatype Record type: "HH" (default), "HL" or "CA".
+#' @param survey Survey to download (see details).
+#' @param years Year or vector of years to download, must be available in DATRAS.
+#' @param quarter Quarter or vector of quarters of the survey.
+#' @param context Execution context: "console" (raises stop) or "shiny"
+#'   (uses shiny::validate). Defaults to "console".
 #' @family quality control
-#' @export
-#' @return data.frame withtthe DATRAS data for the selected survey, year and quaerter
-#' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
-#' @examples safe_getDATRAS("SP-NORTH",2022,4,context="console")
+#' @return data.frame with DATRAS data for the selected survey, years and
+#'   quarter(s).
+#' @details Surveys available in DATRAS: SWC-IBTS, ROCKALL, NIGFS, IE-IGFS,
+#'   SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS, SP-ARSA and others.
+#' @examples
+#' \dontrun{
+#' safe_getDATRAS("HH", "SP-NORTH", 2022, 4, context = "console")
+#' }
 #' @export
 safe_getDATRAS <- function(datatype = "HH", survey, years, quarter,
-                           context = c("console","shiny")) {
+                           context = c("console", "shiny")) {
   context <- match.arg(context)
-  
+
   res <- suppressMessages(
-    icesDatras::getDATRAS(datatype, survey, years, quarters)
+    icesDatras::getDATRAS(datatype, survey, years, quarter)
   )
-  
-  if (identical(res, FALSE)) {
-    msg <- paste0("Survey ", survey,
-                  " with Year ", years,
-                  " and Quarter ", paste(quarters, collapse = ","),
-                  " does not exist.\n",
-                  "Check available options with:\n",
-                  "icesDatras::getDATRAS('", datatype, "', '", survey,
-                  "', ", years, ", 1:4)")
-    
+
+  if (is.null(res) || !is.data.frame(res) || nrow(res) == 0) {
+    msg <- paste0(
+      "No DATRAS data found for:\n",
+      "  record:  ", datatype, "\n",
+      "  survey:  ", survey, "\n",
+      "  years:   ", paste(years, collapse = ", "), "\n",
+      "  quarter: ", paste(quarter, collapse = ", "), "\n",
+      "Check available years/quarters with:\n",
+      "  icesDatras::getSurveyYearList('", survey, "')\n",
+      "  icesDatras::getSurveyYearQuarterList('", survey, "', <year>)"
+    )
     if (context == "console") {
       stop(msg, call. = FALSE)
     } else {
+      if (!requireNamespace("shiny", quietly = TRUE)) {
+        stop(msg, call. = FALSE)   # fallback si shiny no está instalado
+      }
       shiny::validate(shiny::need(FALSE, msg))
     }
   }
-  
+
   res
 }

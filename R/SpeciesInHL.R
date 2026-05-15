@@ -10,7 +10,9 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{SpeciesInHL("SP-NORTH", 2025, 4)}
+#' \dontrun{
+#' SpeciesInHL("SP-NORTH", 2025, 4)
+#' }
 SpeciesInHL <- function(Survey, Year, Quarter) {
   HLsurvey <- icesDatras::getHLdata(Survey, Year, Quarter)
   sort(unname(unlist(worrms::wm_id2name_(unique(HLsurvey$SpecCode)))))

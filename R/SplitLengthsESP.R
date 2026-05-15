@@ -1,5 +1,5 @@
 #' Function SplitLengths extracts from DATRAS the data to produce the IBTS maps with two length ranges for a fix set of species see file SpeciesCodes.csv
-#' @param datSurvey: The Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param datSurvey: The Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param dtyear: year to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in yellow, it depends on the order of years, not the actual chronological year.
 #' @param dtq: the quarter of the survey to be downloaded
 #' @param esp: species to be included in the resulting map if plot=True, name as scientific upto date with WoRMS
@@ -9,15 +9,18 @@
 #' @param save.dat: by default set to FALSE, if TRUE saves the data in a file: IBTSdataSURVEYyrQX.csv
 #' @param out.dat: by default set to FALSE, if TRUE gives the data as output of the function
 #' @param zeros: if TRUE the map includes small points with the hauls with out catch of the species
-#' @details Surveys available in DATRAS recent years and not discontinued: EVHOE, FR-CGFS, 
+#' @details Surveys available in DATRAS recent years and not discontinued: EVHOE, FR-CGFS,
 #' FR-WCGFS, IE-IAMS, IE-IGFS, NIGFS, NS-IBTS, PT-IBTS, SCOROC, SCOWCGFS, SP-ARSA, SP-NORTH, SP-PORC
 #' @return during the calculations shows the types of data in the file "C", "P", "R", And the species of the set present in the Survey/year
-#' @examples SplitLengths("NS-IBTS",2023,3,esp="HKE",zeros=T)
-#' @examples SplitLengths("NS-IBTS",2023,3,esp="MEG",zeros=T)
+#' @examples
+#' \dontrun{
+#' SplitLengths("NS-IBTS",2023,3,esp="HKE",zeros=T)
+#' SplitLengths("NS-IBTS",2023,3,esp="MEG",zeros=T)
+#' }
 #' @export
 #setwd("D:/FVG/Campanas/IBTS/IBTS_2024/mapping/DATOS")
 SplitLengthsESP<-function(datSurvey,dtyear,dtq,esp="Merluccius merluccius",aphia=FALSE,L_Split=21,plot=TRUE,legpos="bottomright",ti=TRUE,save.dat=FALSE,out.dat=FALSE,zeros=FALSE) {
-  if (aphia) Aphia_esp<-worrms::wm_name2id(esp) else Aphia_esp<-esp  
+  if (aphia) Aphia_esp<-worrms::wm_name2id(esp) else Aphia_esp<-esp
   dat.HH<-icesDatras::getHHdata(datSurvey,dtyear,dtq)
   dat.HL<-dplyr::filter(icesDatras::getHLdata(datSurvey,dtyear,dtq),Valid_Aphia==Aphia_esp)
   #print(unique(dat.HH$DataType)) # if only "C" it would already be CPUE, with "R" or "P" has to be weighted to hour: subfactor*60/hauldur already in the code.
@@ -84,21 +87,21 @@ SplitLengthsESP<-function(datSurvey,dtyear,dtq,esp="Merluccius merluccius",aphia
     IBTSNeAtl_map(load=F,leg=F,dens=0,nl=max(dataIBTS.dat$ShootLat)+.5,sl=min(dataIBTS.dat$ShootLat)-.5,xlims=c(min(dataIBTS.dat$ShootLong)-1,1+ifelse(max(dataIBTS.dat$ShootLong)>-8,max(dataIBTS.dat$ShootLong),-8)))
     if (ti) title(main= ifelse(!aphia,worrms::wm_name2id(esp),esp),font.main=4,line=2,sub=bquote(" ">=.(format(paste0(L_Split," cm")))))
 #      bquote(" ">=.(format(paste0(tmin,ifelse(unid.camp(gr,esp)$MED==2," mm"," cm")))))
-    if (zeros)  points(ShootLat~ShootLong,dat.HH,pch=20,cex=.8,col="black")  
+    if (zeros)  points(ShootLat~ShootLong,dat.HH,pch=20,cex=.8,col="black")
     if (!is.na(L_Split)) {
-	     points(ShootLat~ShootLong,dataIBTS.dat,cex=sqrt(dataIBTS.dat[,"Small"]/(.1*hablar::max_(dataIBTS.dat[,"Small"])))*1,pch=21,col="red",lwd=2)
-	     points(ShootLat~ShootLong,dataIBTS.dat,cex=sqrt(dataIBTS.dat[,"Large"]/(.1*hablar::max_(dataIBTS.dat[,"Large"])))*1,pch=21,col="blue",lwd=2)
+	     points(ShootLat~ShootLong,dataIBTS.dat,cex=sqrt(dataIBTS.dat[,"Small"]/(.1*max(dataIBTS.dat[,"Small"],na.rm=TRUE)))*1,pch=21,col="red",lwd=2)
+	     points(ShootLat~ShootLong,dataIBTS.dat,cex=sqrt(dataIBTS.dat[,"Large"]/(.1*max(dataIBTS.dat[,"Large"],na.rm=TRUE)))*1,pch=21,col="blue",lwd=2)
        if (zeros) {
          legend(legpos,c("Small","Large","No Catch"),pch=c(21,21,20),
-                col=c("red","blue","black"),inset=.1,bg="white",pt.lwd = 2,pt.cex = c(1.2,1.2,.8))         
+                col=c("red","blue","black"),inset=.1,bg="white",pt.lwd = 2,pt.cex = c(1.2,1.2,.8))
        }
 	     else legend(legpos,c("Small","Large"),pch=c(21,21),col=c("red","blue"),inset=.1,bg="white",pt.lwd = 2,pt.cex =1.2)
 	     }
     else {
-      points(ShootLat~ShootLong,dataIBTS.dat,cex=sqrt(dataIBTS.dat[,"Total"]/(.1*hablar::max_(dataIBTS.dat[,"Total"])))*1,pch=21,col="navy blue",lwd=2)
+      points(ShootLat~ShootLong,dataIBTS.dat,cex=sqrt(dataIBTS.dat[,"Total"]/(.1*max(dataIBTS.dat[,"Total"],na.rm=TRUE)))*1,pch=21,col="navy blue",lwd=2)
       if (zeros) {
         legend(legpos,c("Catch","No Catch"),pch=c(21,20),
-               col=c("navy blue","black"),inset=.1,bg="white",pt.lwd = 2,pt.cex = c(1.2,.8))         
+               col=c("navy blue","black"),inset=.1,bg="white",pt.lwd = 2,pt.cex = c(1.2,.8))
       }
       else legend(legpos,c("Catch"),pch=c(21),col=c("navy blue"),inset=.1,bg="white",pt.lwd = 2,pt.cex =1.2)
       }

@@ -10,15 +10,17 @@
 #' @param sweeplngt if TRUE haul symbols change with different sweeptlengths. Useful to check if sweep lengths and depths math
 #' @param Depth if TRUE includes the depth of each haul, useful to check if it matches sweep length used
 #' @param leg TRUE includes a legend with the country-sweeplength-colors codes
-#' @param legpos Position of the legend, by default bottomright, (bottomleft, upperleft...) 
+#' @param legpos Position of the legend, by default bottomright, (bottomleft, upperleft...)
 #' @param graf if FALSE the graph goes to screen, if its a file name (i.e. "graf") a file with that name is created and a message with location (wd) is shown in screen
 #' @param xpng width file png if graf is the name of the file
 #' @param ypng height file png if graf is the name of the file
 #' @param ppng points png parameter if graf is the name of the file
 #' @return Presents the map with the stations and a legend with the countries that have participated in the survey
 #' @examples
+#' \dontrun{
 #' SurveyMap.IBTS("NS-IBTS",2021,3,sweeplngt=F,country=T,graf="NS_2021_Q3")
 #' SurveyMap.IBTS("FR-WCGFS",2023,3,ICESrect = T,ICESlab = T,ICESlabcex = .6)
+#' }
 #' @family maps
 #' @export
 SurveyMap.IBTSbl<-function(Survey,Year,Quarter,ti=TRUE,leg=TRUE,legpos="bottomright",colhaul="yellow",
@@ -33,7 +35,7 @@ SurveyMap.IBTSbl<-function(Survey,Year,Quarter,ti=TRUE,leg=TRUE,legpos="bottomri
   if (Survey=="SP-PORC") replong<-2
   if (Survey=="SCOROC") replong<-5
   if (! Survey %in% c("SP-PORC","SCOROC")) replong<-.5
-##  
+##
   IBTSNeAtl_map(load=F,NS=F,leg = F,xlims = c(min(hauls$HaulLong)-.5,replong+max(hauls$HaulLong)),sl=min(hauls$HaulLat)-.5,nl=.5+max(hauls$HaulLat),ICESrect = ICESrect,ICESlab = ICESlab,ICESlabcex = ICESlabcex)
   if (is.logical(ti)) {
     if (ti) {tit<-list(paste0(Survey," ",Year," ",paste0("Q",Quarter,collapse = "-")),font=2,cex=1.2)}

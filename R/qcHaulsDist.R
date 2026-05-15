@@ -1,9 +1,9 @@
 #' Function qcHaulsDist checks consistency between hauls distance, speed and course parameters
-#' 
-#' Produces different plots comparing expected values and those included. 
+#'
+#' Produces different plots comparing expected values and those included.
 #' Data are taken directly from DATRAS using function getDATRAS from library(icesDatras)
 #' It only produces plots for surveys with HH files uploaded in DATRAS
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param allHauls Default is FALSE if TRUE lists values for all hauls, if not only those where pc.error>error
@@ -18,7 +18,10 @@
 #' @family quality control
 #' @references distHaversine function gives the haversine calculation of distance between two geographic points \code{\link[geosphere]{distHaversine}}
 #' @return data.frame with survey, haul, distance and estimated values different errors and hours of dawn/sunrise/dusk
-#' @examples qcHaulsDist("SP-NORTH",c(2024),4,error="Speed"); qcHaulsDist("IE-IAMS",2024,quarter=c(1,1),error="Course")
+#' @examples
+#' \dontrun{
+#' qcHaulsDist("SP-NORTH",c(2024),4,error="Speed"); qcHaulsDist("IE-IAMS",2024,quarter=c(1,1),error="Course")
+#' }
 #' @export
 qcHaulsDist<-function(Survey="NS-IBTS",years,quarter,pc.error=2,error.rb=TRUE,allHauls=FALSE,plots=TRUE,getICES=TRUE,error=c("Dist"),esc.mult=1,graf=FALSE,xpng=800,ypng=800,ppng=15) {
   if (!error %in% c("Dist","Speed","Course")) {stop("Options for error are Dist, Speed or Course")}
@@ -44,14 +47,14 @@ qcHaulsDist<-function(Survey="NS-IBTS",years,quarter,pc.error=2,error.rb=TRUE,al
   for(i in 1:nrow(dumb)) {
     if(dumb$HaulLat[i]==c(-9)) {dumb$HaulLat[i]<-NA}
     if(dumb$HaulLong[i]==c(-9)) {dumb$HaulLong[i]<-NA}
-  }  
+  }
   countries<-unique(dumb$Country)
   #dumb<-dplyr::filter(dumb,Country==country)
   if (length(unique(dumb$Year))>1) stop("Only one year can be shown in this function")
   # print(tapply(dumb$Country,dumb[,c("Country","Year")],"length"))
   if (!is.logical(graf)) png(filename=paste0(graf,".png"),width = xpng,height = ypng, pointsize = ppng)
   if (is.logical(graf)) par(mar=c(2,2.5,2, 2.5) + 0.3,xaxs="i",yaxs="i")
-  dumb$dist.vel<-dumb$HaulDur/60*dumb$GroundSpeed*1852 
+  dumb$dist.vel<-dumb$HaulDur/60*dumb$GroundSpeed*1852
   dumb$dist.hf<-round(geosphere::distHaversine(dumb[,c("ShootLong","ShootLat")],dumb[,c("HaulLong","HaulLat")]))
   dumb$vel.dist<-round((dumb$dist.hf/1852)/(dumb$HaulDur/60),1)
   dumb$error.vel<-round((dumb$dist.vel-dumb$Distance)*100/dumb$Distance,2)
@@ -93,7 +96,7 @@ qcHaulsDist<-function(Survey="NS-IBTS",years,quarter,pc.error=2,error.rb=TRUE,al
     temp<-dumb[order(dumb$Year,dumb$HaulNo),c("Year","quarter","HaulNo","Distance","dist.hf","dist.vel","GroundSpeed","HaulDur","vel.dist","error.dist","error.vel","TowDir","rumb","error.rumb","Country")]
     par(mfrow=c(1,1),mar=c(5,4,4,2))
     if (error=="Dist") {
-      ylims<-hablar::max_(abs(temp$error.dist))*1.1
+      ylims<-max(abs(temp$error.dist),na.rm=TRUE)*1.1
       if (length(countries)==1) {
       plot(error.dist~HaulNo,temp,cex=sqrt(1+abs(error.dist)),pch=21,
          bg= dplyr::if_else(error.dist<0,"red","blue"),type="o",xlim=c(0,max(HaulNo)+1),
@@ -110,7 +113,7 @@ qcHaulsDist<-function(Survey="NS-IBTS",years,quarter,pc.error=2,error.rb=TRUE,al
       title(main="Distance-Points error",cex.main=1.1*esc.mult)
     }
     if (error=="Speed"){
-    ylims<-hablar::max_(abs(temp$error.vel))*1.1
+    ylims<-max(abs(temp$error.vel),na.rm=TRUE)*1.1
     if (length(countries)==1) {
       plot(error.vel~HaulNo,temp,cex=sqrt(abs(error.vel)),pch=21,
          bg=dplyr::if_else(error.vel<0,"red","blue"),type="o",ylim=c(-ylims,ylims),xlim=c(0,max(HaulNo)+1),
@@ -127,7 +130,7 @@ qcHaulsDist<-function(Survey="NS-IBTS",years,quarter,pc.error=2,error.rb=TRUE,al
     title(main="Distance-speed error",cex.main=1.1*esc.mult)
     }
     if (error=="Course"){
-    ylims<-hablar::max_(abs(temp$error.rumb))*1.1
+    ylims<-max(abs(temp$error.rumb),na.rm=TRUE)*1.1
     if (length(countries)==1) {
       plot(error.rumb~HaulNo,temp,cex=sqrt(abs(error.rumb)),pch=21,
          bg=dplyr::if_else(error.rumb<0,"red","blue"),type="o",ylim=c(-ylims,ylims),xlim=c(0,max(HaulNo)+1),
@@ -144,7 +147,7 @@ qcHaulsDist<-function(Survey="NS-IBTS",years,quarter,pc.error=2,error.rb=TRUE,al
     title(main="Course vs. Shoot-end points error",cex.main=1.1*esc.mult)
     }
     }
-  if (length(unique(lubridate::year(dumb$date)))>1) 
+  if (length(unique(lubridate::year(dumb$date)))>1)
     print(paste("Hauls from different years found: ",paste(unique(dumb$Year),collapse = ", ")))
   if (allHauls & error.rb) return(dumb[order(dumb$Survey,dumb$HaulNo),c("Survey","quarter","Year","HaulNo","Distance","dist.hf","dist.vel","GroundSpeed","HaulDur","vel.dist","error.dist","error.vel","TowDir","rumb","error.rumb","sunrise","time_l","sunset","time_v","dusk","daynight")])
   if (!allHauls & error.rb) {lt<-list(lances=(dumb[abs(dumb$error.dist)>pc.error | abs(dumb$error.vel)>pc.error*3 | abs(dumb$error.rumb)>pc.error*3,
@@ -153,6 +156,6 @@ qcHaulsDist<-function(Survey="NS-IBTS",years,quarter,pc.error=2,error.rb=TRUE,al
   return(lt)}
   if (!error.rb) return(dumb[abs(dumb$error.dist)>pc.error | abs(dumb$error.vel)>pc.error*3,
                                 c("Survey","quarter","HaulNo","Distance","dist.hf","dist.vel","GroundSpeed","HaulDur","vel.dist","error.dist","error.vel")])
-}  
-  
-  
+}
+
+

@@ -18,8 +18,10 @@
 #' @param ppng points png parameter if graf is the name of the file
 #' @return Presents the map with the stations and a legend with the countries that have participated in the survey
 #' @examples
+#' \dontrun{
 #' SurveyMap.IBTS("NS-IBTS",2021,3,sweeplngt=F,country=T,graf="NS_2021_Q3")
 #' SurveyMap.IBTS("FR-WCGFS",2023,3,ICESrect = T,ICESlab = T,ICESlabcex = .6)
+#' }
 #' @family maps
 #' @export
 SurveyMap.IBTS<-function(Survey,Year,Quarter,ti=TRUE,leg=TRUE,legpos="bottomright",sweeplngt=TRUE,country=FALSE,colhaul="yellow",

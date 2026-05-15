@@ -1,9 +1,9 @@
 #' Function gearPlotHHNS.wgdp plots Wing Spread vs. Depth behaviour including the NS
-#' 
+#'
 #' Produces a WingSpread vs. DoorSpread plot and a model with nls R function. Data are taken directly from DATRAS using function getHHdata from library(icesDatras)
 #' It only produces plots for surveys with HH files uploaded in DATRAS
 #' If there are two different sweeps in the data, produces a model for each sweep length.
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param country: The country chosen to be plotted (checks if it's available in the HH file)
@@ -15,8 +15,11 @@
 #' @param pF: if set to F takes out the points and leaves only the lines in the graphs
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a graph with WingSpread vs. Depth. it also includes information on the ship, the time series used, the models and parameters estimated.
-#' @examples gearPlotHHNS.wgdp("NS-IBTS",c(2015:2017),1,"SWE",c.inta=.5,c.intb=.8,pF=T)
-#' @examples gearPlotHHNS.wgdp("NS-IBTS",c(2015:2017),1,"SWE",c.inta=.2,c.intb=.3,pF=F)
+#' @examples
+#' \dontrun{
+#' gearPlotHHNS.wgdp("NS-IBTS",c(2015:2017),1,"SWE",c.inta=.5,c.intb=.8,pF=T)
+#' gearPlotHHNS.wgdp("NS-IBTS",c(2015:2017),1,"SWE",c.inta=.2,c.intb=.3,pF=F)
+#' }
 #' @export
 gearPlotHHNS.wgdp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.intb=.3,col1="darkblue",col2="steelblue2",getICES=T,pF=T) {
   if (getICES) {
@@ -45,7 +48,7 @@ gearPlotHHNS.wgdp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
            if(pF) {points(WingSpread~Depth,dumb,subset=WingSpread!=c(-9) & Year!=years[length(years)],pch=21,col=grey(.5))}
            }
          if (length(years)==1) {plot(WingSpread~Depth,dumb,xlim=c(0,dpthA[2]+20),ylim=c(0,wspr[2]+10),type="n",subset=WingSpread!=c(-9) & WingSpread>0,pch=21,col=grey(.5),ylab="Wing spread (m)",xlab="Depth (m)")
-           if (pF) {points(WingSpread~Depth,dumb,xlim=c(0,dpthA[2]+20),,subset=WingSpread!=c(-9) & WingSpread>0,pch=21,col=grey(.5))} 
+           if (pF) {points(WingSpread~Depth,dumb,xlim=c(0,dpthA[2]+20),,subset=WingSpread!=c(-9) & WingSpread>0,pch=21,col=grey(.5))}
            }
          title(paste0("Wing Spread vs. Depth in ",country," ",dumb$Survey[1],".Q",quarter," survey"),line=2.5)
          mtext(paste("Ship:",paste0(unique(dumb$Ship),collapse=" ")),line=.4,cex=.8,adj=0)

@@ -20,6 +20,10 @@ InfoHH(Survey, years, quarter, country = NA, getICES = T)
 }
 \value{
 Produces a graph with WingSpread vs. Depth. it also includes information on the ship, the time series used, the models and parameters estimated.
+#' @examples
+\dontrun{
+InfoHH(Survey="SWC-IBTS",years=c(2011:2016),quarter=4)
+}
 }
 \description{
 Function InfoHH gives the information on Sweep lengths for the years selected
@@ -27,8 +31,4 @@ Data are taken directly from DATRAS getting all the data from DATRAS using funct
 }
 \details{
 Surveys available in DATRAS: i.e. NS-IBTS, SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
-}
-\examples{
-InfoHH(Survey="SWC-IBTS",years=c(2011:2016),quarter=4)
-InfoHH(damb,c(2014:2016),4,getICES=F)
 }

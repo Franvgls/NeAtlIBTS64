@@ -1,9 +1,9 @@
-#' Function gearPlotsHHNS to plot gear parameters and behaviour 
-#' 
+#' Function gearPlotsHHNS to plot gear parameters and behaviour
+#'
 #' Data are taken directly from DATRAS getting all the data from DATRAS using function getHHdata from library(icesDatras)
 #' it only produces plots for surveys with HH files uploaded in DATRAS
 #' If there are DoorSpread and WingSpread values in HH records produces four graphs, if only DoorSpread values are available produces only two graphs
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in yellow, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param c.inta: the confidence interval to be used in the confint function for long sweeps and for sweeps if there is only one length
@@ -14,8 +14,11 @@
 #' @param pF: takes out the points and leaves only the lines in the graphs
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a set of 4 or 2 graphs: Warp shot vs. depth, DoorSpread vs. WingSpread, WingSpread vs. Depth, DoorSpread vs. Depth, Vertical Opening vs Depth  it also includes information on the ship, the time series used (bottom fourth graph), the models and parameters estimated.
-#' @examples gearPlotsHHNS("NS-IBTS",2016:2017,3,"GFR")
-#' @examples gearPlotsHHNS("NS-IBTS",2016:2017,1,"DEN")
+#' @examples
+#' \dontrun{
+#' gearPlotsHHNS("NS-IBTS",2016:2017,3,"GFR")
+#' gearPlotsHHNS("NS-IBTS",2016:2017,1,"DEN")
+#' }
 #' @export
 gearPlotsHHNS<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.5,c.intb=.5,col1="darkblue",getICES=T,pF=T) {
   if (getICES) {
@@ -43,4 +46,3 @@ gearPlotsHHNS<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.5,c.intb=
   par(opar)
   }
 
-            

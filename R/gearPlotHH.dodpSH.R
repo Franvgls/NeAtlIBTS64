@@ -1,24 +1,27 @@
 #' Function gearPlotHH.dodp Door Spread versus Depth
-#' 
+#'
 #' Produces a DoorSpread vs. Depth plot and model with nls R function. Data are taken directly from DATRAS using function getDATRAS from library(icesDatras)
 #' it only produces plots for surveys with HH files uploaded in DATRAS
 #' If there are two different sweeps in the data, produces a model for each sweep length.
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be plotted
-#' @param c.int: the confidenc interval to be used in the confint function
+#' @param c.int: the confidence interval to be used in the confint function
 #' @param c.inta: the confidence interval to be used in the confint function for all data if only one sweep length, and for the short sweeps in case there are two
 #' @param c.intb: the confidence interval to be used in the confint function for the long set of sweeps.
-#' @param es: si T titulos y leyendas salen en espa\u00f1ol, si no en ingl\u00e9s.
+#' @param es: if T titles and legend are in Spanish, if F in English
 #' @param col1: color for the symbols and lines for the whole set if only one set of sweeps are used, and for the data from the long set of sweeps.
 #' @param col2: color for the symbols and lines for the data from the short sweeps in case there are two.
-#' @param esc.mult Size of the legends and text in graphs, 
+#' @param esc.mult Size of the legends and text in graphs,
 #' @param getICES: Should the data be downloaded from DATRAS? If T, default, the data are taken from DATRAS through the icesDatras package.
 #' @param ti: if F title will not be included automatically and can be addedd later
 #' @param pF: takes out the points and leaves only the lines in the graphs
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a graph DoorSpread vs. Depth, it also includes information on the ship, the time series used, the models and parameters estimated.
-#' @examples gearPlotHHNS.dodp("NS-IBTS",c(2014:2017),3,"SCO",.8,.3,col1="darkblue",col2="darkgreen")
+#' @examples
+#' \dontrun{
+#' gearPlotHHNS.dodp("NS-IBTS",c(2014:2017),3,"SCO",.8,.3,col1="darkblue",col2="darkgreen")
+#' }
 #' @export
 gearPlotHH.dodpSH<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,es=F,col1="darkblue",col2="steelblue2",esc.mult=1,getICES=T,ti=T,pF=T) {
   if (getICES) {
@@ -43,8 +46,8 @@ gearPlotHH.dodpSH<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,es=F,col1="
          dspr<-range(subset(dumb,DoorSpread>c(-9))$DoorSpread,na.rm=T)
          if (pF) {
            points(DoorSpread~Depth,dumb,pch=21,bg=col1)
-           # if (length(years)>1) legend("bottomright",c(paste0(years[1],"-",years[length(years)-1]),years[length(years)]),pch=c(1,21),col=c(col1),pt.bg=c(NA,col1),bty="n",inset=.02)              
-           # else 
+           # if (length(years)>1) legend("bottomright",c(paste0(years[1],"-",years[length(years)-1]),years[length(years)]),pch=c(1,21),col=c(col1),pt.bg=c(NA,col1),bty="n",inset=.02)
+           # else
            legend("bottomright",as.character(paste(years[1],"-",years[length(years)])),pch=21,col=col1,pt.bg=col1,bty="n",inset=.02,cex=1*esc.mult)
           }
          mtext(paste(dumb$Ship[1]),line=.4,cex=.8*esc.mult,adj=0)
@@ -79,12 +82,12 @@ gearPlotHH.dodpSH<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,es=F,col1="
             if (pF) {
               points(DoorSpread~Depth,dumbshort,pch=21,bg=col2)
             }
-  #          if (length(years)>1) legend("bottomright",c(paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c(ifelse(es,"Malletas cortas","Short sweeps")),sep=" "),paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c(ifelse(es,"Malletas largas","Long sweeps")),sep=" ")),pch=21,col=c(col2,col2,col1,col1),pt.bg=c(NA,col2,NA,col1),bty="n",inset=c(.02),ncol=2)           
+  #          if (length(years)>1) legend("bottomright",c(paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c(ifelse(es,"Malletas cortas","Short sweeps")),sep=" "),paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c(ifelse(es,"Malletas largas","Long sweeps")),sep=" ")),pch=21,col=c(col2,col2,col1,col1),pt.bg=c(NA,col2,NA,col1),bty="n",inset=c(.02),ncol=2)
 #            else {
               if (es) legend("bottomright",legend=c("Malletas cortas","Malletas largas"),pch=21,col=c(col1,col1),pt.bg=c(col2,col1),inset=.04,bty="n",cex=1*esc.mult)
               else legend("bottomright",legend=c("Short sweeps","Long sweeps"),pch=21,col=c(col1,col1),pt.bg=c(col2,col1),inset=.04,bty="n",cex=1*esc.mult)
               text(0,0, as.character(years),adj=0.01,font=1, cex=.8*esc.mult,pos=4)
-#            }            
+#            }
             if (ti) title(main=paste0(ifelse(es,"Abertura de puertas vs. profunfidad en ","Door Spread vs. Depth in "),dumb$Survey[1],".Q",quarter),line=2.5,cex.main=1.1*esc.mult)
             mtext(dumb$Ship[1],line=.4,cex=.8*esc.mult,adj=0)
             a1st<-round(coef(DoorSpreadst.log)[1],2)

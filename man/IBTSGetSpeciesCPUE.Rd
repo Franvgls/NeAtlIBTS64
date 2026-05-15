@@ -12,6 +12,7 @@ IBTSGetSpeciesCPUE(
   valid_only = TRUE,
   HHdata = NULL,
   local_HL = NULL,
+  local_HH = NULL,
   verbose = TRUE
 )
 }
@@ -35,12 +36,20 @@ E.g. \code{c(3, 4)} skips all Q1 surveys.  Default NULL = all quarters.}
 \item{valid_only}{Logical.  Keep only HaulVal \\%in\\% c("V","A").
 Default TRUE.}
 
+\item{HHdata}{Output of \code{IBTSSurveySummary()} to reuse cached HH data.
+NULL downloads fresh HH from DATRAS for each survey.}
+
 \item{local_HL}{data.frame opcional en formato DATRAS HL con datos locales
 (e.g. especies no subidas aún a DATRAS). Se filtra por \code{Survey} y
 \code{Quarter} y se añade mediante \code{rbind} al HL descargado antes
 de cualquier procesamiento. \code{DataType} se fuerza a \code{"R"}.
-El \code{HaulDur} se tomará del HH existente vía \code{HaulNo}.#' @param HHdata Output of \code{IBTSSurveySummary()} to reuse cached HH data.
-NULL downloads fresh HH from DATRAS for each survey.}
+El \code{HaulDur} se tomará del HH existente vía \code{HaulNo}.}
+
+\item{local_HH}{data.frame opcional en formato DATRAS HH con datos locales
+(e.g. campanas no subidas aun a DATRAS como PT-IBTS Q4). Debe tener
+columnas \code{Survey} y \code{Quarter} para el filtro por clave.
+Si hay filas para un \code{surv+q}, se usan en vez de descargar HH de
+DATRAS Y se omite el chequeo de disponibilidad en DATRAS para esa clave.}
 
 \item{verbose}{Logical.  Print progress messages.  Default TRUE.}
 }

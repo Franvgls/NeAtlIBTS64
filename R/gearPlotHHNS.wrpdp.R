@@ -1,21 +1,24 @@
-#' Function gearPlotHHNS.wrpdp plots warp length vs. Depth behaviour 
-#' 
+#' Function gearPlotHHNS.wrpdp plots warp length vs. Depth behaviour
+#'
 #' Produces a warplength vs. DoorSpread plot and a model with lm unction. Data are taken directly from DATRAS using function getHHdata from library(icesDatras)
 #' It only produces plots for surveys with HH files uploaded in DATRAS
 #' Since sweeps length does not affect the warp that is decided by the chief scientist, there are no differences depending on sweeps
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param country: The country chosen to be plotted (checks if it's available in the HH file)
 #' @param line: includes a regression line between Warp and depth and the formula of the linear regression. If F the line is omited
-#' @param c.inta: the confidence interval to be used in the predict.lm function 
+#' @param c.inta: the confidence interval to be used in the predict.lm function
 #' @param col1: the color of the points, last year fill and previous years empty symbol
 #' @param getICES: Should the data be downloaded from DATRAS? If T, default, the data are taken from DATRAS through the icesDatras package.
 #' @param pF: takes out the points and leaves only the lines in the graphs
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a graph Warp length vs. Depth for the years selected.
 #, it also includes information on the ship, the time series used the model used and parameters estimated.
-#' @examples gearPlotHHNS.wrpdp("NS-IBTS",c(2014:2017),1,"SWE")
+#' @examples
+#' \dontrun{
+#' gearPlotHHNS.wrpdp("NS-IBTS",c(2014:2017),1,"SWE")
+#' }
 #' @export
 gearPlotHHNS.wrpdp<-function(Survey="NS-IBTS",years,quarter,country,line=T,c.inta=.85,col1="darkblue",getICES=T,pF=T) {
   if (getICES) {
@@ -67,6 +70,6 @@ gearPlotHHNS.wrpdp<-function(Survey="NS-IBTS",years,quarter,country,line=T,c.int
      }
    }
 }
-   
-   
+
+
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/safe_getDATRAS.R
 \name{safe_getDATRAS}
 \alias{safe_getDATRAS}
-\title{Function safe_getDATRAS gets data from DATRAS and shows original messages to the users but inside R and shiny}
+\title{Wrap icesDatras::getDATRAS with friendly errors}
 \usage{
 safe_getDATRAS(
   datatype = "HH",
@@ -13,25 +13,34 @@ safe_getDATRAS(
 )
 }
 \arguments{
-\item{Survey:}{either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter}
+\item{datatype}{Record type: "HH" (default), "HL" or "CA".}
 
-\item{years:}{years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.}
+\item{survey}{Survey to download (see details).}
 
-\item{quarter:}{the quarter of the survey to be ploted}
+\item{years}{Year or vector of years to download, must be available in DATRAS.}
 
-\item{context:}{evaluates if running within a normal script or within shiny app}
+\item{quarter}{Quarter or vector of quarters of the survey.}
+
+\item{context}{Execution context: "console" (raises stop) or "shiny"
+(uses shiny::validate). Defaults to "console".}
 }
 \value{
-data.frame withtthe DATRAS data for the selected survey, year and quaerter
+data.frame with DATRAS data for the selected survey, years and
+quarter(s).
 }
 \description{
-Downloads data from DATRAS or sends its errors
+Downloads data from DATRAS and handles missing data gracefully, both from
+the console (stop with a helpful message) and from Shiny (validate+need).
+\code{shiny} is only required when \code{context = "shiny"}; it is listed as Suggests.
 }
 \details{
-Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
+Surveys available in DATRAS: SWC-IBTS, ROCKALL, NIGFS, IE-IGFS,
+SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS, SP-ARSA and others.
 }
 \examples{
-safe_getDATRAS("SP-NORTH",2022,4,context="console")
+\dontrun{
+safe_getDATRAS("HH", "SP-NORTH", 2022, 4, context = "console")
+}
 }
 \seealso{
 Other quality control: 

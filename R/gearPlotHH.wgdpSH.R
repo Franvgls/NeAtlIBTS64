@@ -1,9 +1,9 @@
-#' Function gearPlotHH.wgdp plots Wing Spread vs. Depth 
-#' 
+#' Function gearPlotHH.wgdp plots Wing Spread vs. Depth
+#'
 #' Produces a WingSpread vs. DoorSpread plot and a model with nls R function. Data are taken directly from DATRAS using function getDATRAS from library(icesDatras)
 #' It only produces plots for surveys with HH files uploaded in DATRAS
 #' If there are two different sweeps in the data, produces a model for each sweep length.
-#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter 
+#' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param c.inta: the confidence interval to be used in the confint function for long sweeps and for sweeps if there is only one length
@@ -16,8 +16,11 @@
 #' @param ti: if F title will not be included automatically and can be addedd later
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces a graph with WingSpread vs. Depth. it also includes information on the ship, the time series used, the models and parameters estimated.
-#' @examples gearPlotHH.wgdp("SWC-IBTS",c(2014:2016),1,.6,.2,col1="darkblue",col2="steelblue")
-#' @examples gearPlotHH.wgdp(damb,c(2014:2016),4,pF=F,getICES=F)
+#' @examples
+#' \dontrun{
+#' gearPlotHH.wgdp("SWC-IBTS",c(2014:2016),1,.6,.2,col1="darkblue",col2="steelblue")
+#' gearPlotHH.wgdp(damb,c(2014:2016),4,pF=F,getICES=F)
+#' }
 #' @export
 gearPlotHH.wgdpSH<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,es=FALSE,col1="darkblue",col2="steelblue2",esc.mult=1,getICES=TRUE,pF=TRUE,ti=TRUE) {
   if (getICES) {
@@ -48,7 +51,7 @@ gearPlotHH.wgdpSH<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,es=FALSE,co
            if (pF) {
              points(WingSpread~Depth,dumb,xlim=c(0,dpthA[2]+20),subset=WingSpread!=c(-9) & WingSpread>0,pch=21,col=col1)
              #legend("bottomright",legend=as.character(c(years)),pch=21,col=col1,pt.bg=col1,bty="n",inset=.04)
-           } 
+           }
            }
          #if (ti) title(main=paste0(ifelse(es,"Abertura calones vs. profundidad en ","Wing Spread vs. Depth in "),dumb$Survey[1],".Q",quarter),line=2.5)
          if (length(levels(factor(dumb$sweeplngt)))<2) {
@@ -59,7 +62,7 @@ gearPlotHH.wgdpSH<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,es=FALSE,co
             if (pF) {
               points(WingSpread~Depth,dumb,pch=21,bg=col1)
               # if (length(years)>1) legend("bottomright",legend=c(paste0(years[1],"-",years[length(years)-1]),as.character(years[length(years)])),pch=21,col=col1,pt.bg=c(NA,col1),bty="n",inset=.02)
-              # else 
+              # else
               legend("bottomright",as.character(paste(years[1],"-",years[length(years)])),pch=21,col=col1,pt.bg=col1,bty="n",inset=.04,cex=1*esc.mult)
               }
             if (ti) title(paste0(ifelse(es,"Abertura vertical vs. profundidad en","Wing Spread vs. Depth in "),dumb$Survey[1],".Q",quarter),line=2.5,cex.main=1.1*esc.mult)
@@ -95,8 +98,8 @@ gearPlotHH.wgdpSH<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,es=FALSE,co
             }
             if (pF) {
               points(WingSpread~Depth,dumbshort,subset=HaulVal=="V",pch=21,col=col2,bg=col2)
-              points(WingSpread~Depth,dumblong,subset=HaulVal=="V",pch=21,col=col1,bg=col1)            
-              #if (length(years)>1) legend("bottomright",c(paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c(ifelse(es,"Malletas cortas","Short sweeps")),sep=" "),paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c(ifelse(es,"Malletas largas","Long sweeps")),sep=" ")),pch=21,col=c(col2,col1,col1,col1),pt.bg=c(NA,col2,NA,col1),bty="n",inset=c(.02),ncol=2)           
+              points(WingSpread~Depth,dumblong,subset=HaulVal=="V",pch=21,col=col1,bg=col1)
+              #if (length(years)>1) legend("bottomright",c(paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c(ifelse(es,"Malletas cortas","Short sweeps")),sep=" "),paste(c(paste(years[1],years[length(years)-1],sep="-"),years[length(years)]),c(ifelse(es,"Malletas largas","Long sweeps")),sep=" ")),pch=21,col=c(col2,col1,col1,col1),pt.bg=c(NA,col2,NA,col1),bty="n",inset=c(.02),ncol=2)
               if(es) legend("bottomright",c("Malletas cortas","Malletas largas"),pch=21,col=c(col1,col1),pt.bg = c(col2,col1),bty="n",inset=.04,cex=1*esc.mult)
               else legend("bottomright",c("Short sweeps","Long sweeps"),pch=21,col=c(col1,col1),pt.bg = c(col2,col1),bty="n",inset=.04,cex=1*esc.mult)
               }

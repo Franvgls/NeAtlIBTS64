@@ -17,21 +17,17 @@
 #' @param ti: if F title will not be included automatically and can be addedd later
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
 #' @return Produces Net Vertical opening vs. Depth plot it also includes information on the ship, the time series used (bottom fourth graph), the models and parameters estimated.
-#' @examples gearPlotHH.nodp("SWC-IBTS",c(2014:2016),1,.07,.5,col1="darkblue",col2="steelblue2")
-#' @examples gearPlotHH.nodp("SWC-IBTS",c(2014:2016),1,.07,.5,col1="darkblue",col2="steelblue2",pF=F)
-#' @examples gearPlotHH.nodp("SWC-IBTS",c(2013:2016),4)
-#' @examples gearPlotHH.nodp("ROCKALL",c(2013:2016),3)
-#' @examples gearPlotHH.nodp("NIGFS",c(2005:2016),1)
-#' @examples gearPlotHH.nodp("NIGFS",c(2006:2007,2009:2016),4)
-#' @examples gearPlotHH.nodp("IE-IGFS",c(2011:2016),4,.8)
-#' @examples gearPlotHH.nodp("SP-PORC",c(2010:2016),3)
-#' @examples gearPlotHH.nodp("FR-CGFS",c(2014:2016),4)
-#' @examples gearPlotHH.nodp("EVHOE",c(1997:2015),4)
-#' @examples gearPlotHH.nodp("SP-NORTH",c(2014:2016),4,col1="darkblue",col2="yellow")
-#' @examples gearPlotHH.nodp("SP-ARSA",c(2014:2016),1)
-#' @examples gearPlotHH.nodp("SP-ARSA",c(2014:2016),4)
-#' @examples gearPlotHH.nodp(getICES=F,damb,c(2014:2016),4,pF=F)
-#' @examples gearPlotHH.nodp(getICES=F,Survey=damb,years=c(2014:2016),quarter=4,pF=F)
+#' @examples
+#' \dontrun{
+#' gearPlotHH.nodp("SWC-IBTS",c(2014:2016),1,.07,.5,col1="darkblue",col2="steelblue2")
+#' gearPlotHH.nodp("SWC-IBTS",c(2014:2016),1,.07,.5,col1="darkblue",col2="steelblue2",pF=F)
+#' gearPlotHH.nodp("SWC-IBTS",c(2013:2016),4)
+#' gearPlotHH.nodp("ROCKALL",c(2013:2016),3)
+#' gearPlotHH.nodp("NIGFS",c(2005:2016),1)
+#' gearPlotHH.nodp("NIGFS",c(2006:2007,2009:2016),4)
+#' gearPlotHH.nodp("IE-IGFS",c(2011:2016),4,.8)
+#' gearPlotHH.nodp("SP-PORC",c(2010:2016),3)
+#' }
 #' @export
 gearPlotHH.nodp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,es=FALSE,col1="darkblue",col2="steelblue2",getICES=TRUE,pF=TRUE,ti=TRUE) {
 ## get the data

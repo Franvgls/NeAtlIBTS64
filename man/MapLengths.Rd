@@ -68,7 +68,11 @@ Surveys available in DATRAS recent years and not discontinued: EVHOE, FR-CGFS,
 FR-WCGFS, IE-IAMS, IE-IGFS, NIGFS, NS-IBTS, PT-IBTS, SCOROC, SCOWCGFS, SP-ARSA, SP-NORTH, SP-PORC
 }
 \examples{
-MapLengths("SP-NORTH",2024,4,esp="HKE",tmin=0,tmax=20,zeros=T,add=F)
-MapLengths("NS-IBTS",2023,3,esp="MEG",tmin=20,tmax=50,zeros=T,add=F)
-NeAtlIBTS::IBTSNeAtl_map(load=F,leg=F,xlims=c(-16,13),bw=T);MapLengths("NS-IBTS",2023,3,esp="HKE",tmin=0,tmax=21,zeros=T,add=T)
+\dontrun{
+MapLengths("SP-NORTH", 2024, 4, esp="HKE", tmin=0, tmax=20, zeros=TRUE, add=FALSE)
+MapLengths("NS-IBTS", 2023, 3, esp="MEG", tmin=20, tmax=50, zeros=TRUE, add=FALSE)
+
+NeAtlIBTS64::IBTSNeAtl_map64(load=FALSE, leg=FALSE, xlims=c(-16,13), bw=TRUE)
+MapLengths("NS-IBTS", 2023, 3, esp="HKE", tmin=0, tmax=21, zeros=TRUE, add=TRUE)
+}
 }

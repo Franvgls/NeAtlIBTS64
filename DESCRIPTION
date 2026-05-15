@@ -1,9 +1,14 @@
 Package: NeAtlIBTS64
-Title: Scritps and functions for the IBTSNeAtl in 64bits (One Line, Title Case)
-Version: 0.0.3
+Title: Scripts and functions for the IBTSNeAtl in 64bits 
+Version: 0.0.4
 Authors@R: 
-    person("Fran", "Velasco", , "Franvgls@gmail.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+    person("Francisco", "Velasco", , "Franvgls@gmail.com", role = c("aut", "cre"),comment=c(ORCID="0000-0002-6420-9474"))
+Description: R 4.x port of NeAtlIBTS. Provides quality-control plotting and
+    DATRAS-based analysis functions for ICES International Bottom Trawl
+    Surveys in the Northeast Atlantic. Includes gear-parameter plots
+    (door spread, wing spread, warp length, net opening), haul-level QC
+    (distance, speed, course, position), survey map wrappers, and helpers
+    for handling historical and ongoing bottom-trawl survey data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -16,15 +21,18 @@ Imports:
     lubridate,
     suncalc,
     worrms,
-    grDevices,
-    graphics,
-    stats,
-    utils,
-    methods
+    data.table,
+    maps,
+    mapdata,
+    sp,
+    magrittr
 Suggests: 
-    sp
+    shiny,
+    testthat (>= 3.0.0),
+    withr
 URL: https://github.com/Franvgls/NeAtlIBTS64
 BugReports: https://github.com/Franvgls/NeAtlIBTS64/issues
 Depends: 
     R (>= 4.0)
 LazyData: true
+Config/testthat/edition: 3
