@@ -11,7 +11,7 @@ The goal of NeAtlIBTS64 is to develope the functions already developed in 32bits
 You can install the development version of NeAtlIBTS64 like so:
 
 ```r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+remotes::install_github("franvgls\NeAtlIBTS64")
 ```
 
 ## Example
