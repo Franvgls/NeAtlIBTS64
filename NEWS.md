@@ -28,3 +28,18 @@
 * Ejemplos de funciones que requieren acceso a DATRAS o datos locales
   envueltos en `\dontrun{}` (gearPlot*, qcHauls*, SplitLengths*,
   SurveyMap.IBTS*, MapLengths, getDatras2).
+
+# NeAtlIBTS64 0.0.6
+
+## Funciones nuevas
+* `AuditAlkCAMP_DATRAS()`: compara otolitos por talla entre el CAMP
+  local (via GetAlk.camp64) y DATRAS, detectando discrepancias y
+  marcando tallas con datos imputados (flag 99/100 IEO).
+
+## Mejoras
+* `GetAlkDTR.NeAtl64()`: guarda n_por_talla como atributo antes de
+  calcular proporciones, permitiendo llamadas anidadas directas dentro
+  de GrafAlk.NeAtl64 sin perder el n encima de las barras.
+* `GrafAlk.NeAtl64()`: acepta ahora dos formatos de entrada — formato
+  agregado (talla, sexo, E0..Eplus+, salida de GetAlkDTR.NeAtl64) y
+  formato individual (LngtClasscm, Age, CA records crudos).
