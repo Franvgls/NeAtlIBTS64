@@ -24,7 +24,7 @@
 #' gearPlotdumb.wrpdp("NS-IBTS",c(2014:2017),1,"SWE")
 #' }
 #' @export
-qcHaulsPosit<-function(Survey="NS-IBTS",years,quarter,col1="red",ti=TRUE,Hpoints=FALSE,Nhauls=FALSE,getICES=TRUE,esc.mult=1,graf=FALSE,xpng=800,ypng=800,ppng=15) {
+qcHaulsPosit<-function(Survey="NS-IBTS",years,quarter,col1="red",ti=TRUE,Hpoints=FALSE,Nhauls=FALSE,getICES=TRUE,esc.mult=1,graf=FALSE,xpng=800,ypng=800,ppng=15,shpdir = system.file("shapes", package = "NeAtlIBTS64")) {
   if (getICES) {
     dumb<-icesDatras::getDATRAS("HH",Survey,years,quarter)
   }
@@ -53,7 +53,7 @@ qcHaulsPosit<-function(Survey="NS-IBTS",years,quarter,col1="red",ti=TRUE,Hpoints
   if (any(! Survey %in% c("SP-PORC","SCOROC"))) replong<-.5
   ##
   IBTSNeAtl_map64(load=F,NS=F,leg=F,newdev=FALSE,xlims = c(min(dumb$ShootLong)-.5,replong+max(dumb$ShootLong))
-                  ,ylims=c(min(dumb$ShootLat)-.5,.5+max(dumb$ShootLat)),places=T)
+                  ,ylims=c(min(dumb$ShootLat)-.5,.5+max(dumb$ShootLat)),places=T,shpdir=shpdir)
   segments(dumb$ShootLong,dumb$ShootLat,dumb$HaulLong,dumb$HaulLat,col="red",lwd=2)
   if (Nhauls) text(dumb$ShootLong,dumb$ShootLat,labels = dumb$HaulNo,cex=.8)
   if (Hpoints) points(ShootLat~ShootLong,dumb,pch=21,cex=2,bg="blue")
