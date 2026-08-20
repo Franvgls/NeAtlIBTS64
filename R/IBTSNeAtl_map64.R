@@ -92,18 +92,12 @@ IBTSNeAtl_map64 <- function(xlims = NULL, ylims = NULL,
   read_shp <- function(base, layer = NULL) {
     # Intenta .shp, .gpkg y .dbf en ese orden
     for (ext in c(".shp", ".gpkg", ".dbf")) {
-      print(ext)
       f <- file.path(shpdir, paste0(base, ext))
-      print(f)
       if (file.exists(f)) {
-        print(paste0(f," exists"))
         sf_obj <- sf::st_read(f, quiet = TRUE)
-        print("Got here 1")
         sf_obj <- sf_obj[!sf::st_is_empty(sf_obj), ]
-        print("Got here 2")
-        if (is.na(sf::st_crs(sf_obj))) sf::st_crs(sf_obj) <- 4326
+         if (is.na(sf::st_crs(sf_obj))) sf::st_crs(sf_obj) <- 4326
         sf_obj <- tryCatch(sf::st_transform(sf_obj, 4326), error = function(e) sf_obj)
-        print("Got here 3")
         return(sf_obj)
       }
     }

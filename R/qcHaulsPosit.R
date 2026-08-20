@@ -17,6 +17,7 @@
 #' @param ypng height file png if graf is the name of the file
 #' @param ppng points png parameter if graf is the name of the file
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
+#' @shpdir path to the folder with the shapefiles
 #' @return Produces a map with segments of the hauls performed in that survey.
 #, it also includes information on the ship, the time series used the model used and parameters estimated.
 #' @examples
