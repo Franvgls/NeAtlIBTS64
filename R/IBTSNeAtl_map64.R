@@ -96,7 +96,7 @@ IBTSNeAtl_map64 <- function(xlims = NULL, ylims = NULL,
       if (file.exists(f)) {
         sf_obj <- sf::st_read(f, quiet = TRUE)
         sf_obj <- sf_obj[!sf::st_is_empty(sf_obj), ]
-        if (is.na(sf::st_crs(sf_obj))) sf::st_crs(sf_obj) <- 4326
+         if (is.na(sf::st_crs(sf_obj))) sf::st_crs(sf_obj) <- 4326
         sf_obj <- tryCatch(sf::st_transform(sf_obj, 4326), error = function(e) sf_obj)
         return(sf_obj)
       }
@@ -133,7 +133,8 @@ IBTSNeAtl_map64 <- function(xlims = NULL, ylims = NULL,
   # --- Lectura de capas base ---
   ices.div_sp  <- to_sp(read_shp("ices_div"))
   bath100_sp   <- to_sp(read_shp("100m"))
-  bathy_geb_sf <- read_shp("bathy_geb")
+  #bathy_geb_sf <- read_shp("bathy_geb")
+  bathy_geb_sf <- read_shp("Bathy_geb") # Fix capitalisation to match file name
   if ("DEPTH" %in% names(bathy_geb_sf))
     bathy_geb_sf <- bathy_geb_sf[bathy_geb_sf$DEPTH != 100, ]
   bathy_geb_sp <- to_sp(bathy_geb_sf)
