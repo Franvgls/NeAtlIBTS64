@@ -3,9 +3,11 @@
 #' @param summary_df data.frame con el resumen de IBTSSurveySummary(), o la lista completa
 #' @param year anio del diagrama. Si NULL se infiere del summary
 #' @param IBTSsurvs data.frame con columnas survey y color (dataset del paquete). Si NULL colores por quarter
+#' @param cex Factor global de escala de texto. Default 1. Aumentar (ej. 1.4)
+#'   para png de alta resolucion o presentaciones.
 #' @return invisible: el data.frame ordenado usado para el grafico
 #' @export
-IBTSGantt <- function(summary_df, year = NULL, IBTSsurvs = NULL) {
+IBTSGantt <- function(summary_df, year = NULL, IBTSsurvs = NULL, cex = 1) {
 
   # Aceptar lista completa de IBTSSurveySummary()
   if (is.list(summary_df) && "summary" %in% names(summary_df))
@@ -49,24 +51,45 @@ IBTSGantt <- function(summary_df, year = NULL, IBTSsurvs = NULL) {
   n   <- nrow(gdf)
 
   # --- Rangos ---
-  x_min <- min(gdf$start_date) - 5
-  x_max <- max(gdf$end_date)   + 5
+  # Grafico anual: siempre se muestra el ano completo, tenga o no campanas en enero
+  x_min <- as.Date(paste0(year, "-01-01"))
+  x_max <- as.Date(paste0(year, "-12-31"))
 
-  meses <- seq.Date(as.Date(paste0(year, "-01-01")),
-                    as.Date(paste0(year, "-12-31")), by = "month")
-  meses <- meses[meses >= x_min & meses <= x_max]
+  meses <- seq.Date(x_min, x_max, by = "month")
 
-  # Ancho dinamico del rotulo Y y separacion
   rango_x <- as.numeric(x_max) - as.numeric(x_min)
-  lbl_w   <- rango_x * 0.13
-  lbl_sep <- rango_x * 0.05
 
-  # --- Lienzo ---
-  left_mar <- max(nchar(gdf$label)) * 0.9 + 2
-  par(mar = c(4, left_mar, 3, 2))
+  # --- Tamanos de letra (todos relativos al cex global) ---
+  cex_lbl  <- .85 * cex   # rotulo Y (nombre de campana)
+  cex_in   <- .80 * cex   # texto interior de barra (validos/totales)
+  cex_date <- .82 * cex   # fechas de inicio/fin
+  cex_axis <- .95 * cex   # eje de meses
+
+  # --- Margen izquierdo: medido con el ancho real del rotulo mas largo ---
+  # (en pulgadas, via strwidth) en vez de una heuristica basada en nchar().
+  # Asi el rectangulo de color del rotulo Y coincide siempre con el margen
+  # real reservado por par(), sea cual sea el tamano/resolucion del dispositivo.
+  par(mar = c(4, 4, 3, 2))
+  plot.new()   # lienzo provisional, solo para poder medir texto con strwidth()
+  label_w_in <- max(strwidth(gdf$label, units = "inches", cex = cex_lbl, font = 2))
+  mai <- par("mai")
+  mai[2] <- label_w_in + 0.12
+  par(mai = mai)
+
+  # --- Lienzo definitivo ---
+  # xaxs/yaxs = "i" quita el padding automatico del 4%, para que fondos,
+  # barras y linea inferior coincidan exactamente con x_min/x_max y el rango Y.
   plot(NULL,
        xlim = c(x_min, x_max), ylim = c(0.5, n + 0.5),
+       xaxs = "i", yaxs = "i",
        xaxt = "n", yaxt = "n", xlab = "", ylab = "", bty = "n")
+
+  # Borde izquierdo real de la figura (coordenadas de usuario), para que el
+  # rotulo Y quede pegado exactamente al margen fijado arriba
+  usr <- par("usr"); plt <- par("plt")
+  x_scale  <- (usr[2] - usr[1]) / (plt[2] - plt[1])
+  rect_izq <- usr[1] - plt[1] * x_scale
+  rect_der <- usr[1]
 
   # Fondo alternado por fila
   for (i in seq_len(n)) {
@@ -83,34 +106,40 @@ IBTSGantt <- function(summary_df, year = NULL, IBTSsurvs = NULL) {
     bc <- gdf$bar_color[i]   # color de fondo de esta fila
     tc <- txt_col(bc)        # "black" o "white" segun luminancia
 
+    x0 <- as.numeric(gdf$start_date[i])
+    x1 <- as.numeric(gdf$end_date[i])
+
     # Barra
-    rect(as.numeric(gdf$start_date[i]), i - .35,
-         as.numeric(gdf$end_date[i]),   i + .35,
-         col = bc, border = NA)
+    rect(x0, i - .35, x1, i + .35, col = bc, border = NA)
 
-    # Texto interior: validos/totales — color adaptado a luminancia
-    mid <- as.numeric(gdf$start_date[i]) +
-      (as.numeric(gdf$end_date[i]) - as.numeric(gdf$start_date[i])) / 2
-    text(mid, i, paste0(gdf$N_valid[i], "/", gdf$N_hauls[i]),
-         col = tc, cex = .7, font = 2)
+    # Texto interior: validos/totales — encogido si no cabe en la barra
+    lab_in <- paste0(gdf$N_valid[i], "/", gdf$N_hauls[i])
+    mid    <- x0 + (x1 - x0) / 2
+    bar_w  <- x1 - x0
+    cex_i  <- cex_in
+    w_txt  <- strwidth(lab_in, units = "user", cex = cex_i, font = 2)
+    if (w_txt > bar_w * 0.9)
+      cex_i <- max(cex_i * (bar_w * 0.9) / w_txt, 0.35 * cex)
+    text(mid, i, lab_in, col = tc, cex = cex_i, font = 2)
 
-    # Fechas fuera de la barra
-    text(as.numeric(gdf$start_date[i]), i, gdf$Start[i], pos = 2, cex = .65, font = 2)
-    text(as.numeric(gdf$end_date[i]),   i, gdf$End[i],   pos = 4, cex = .65, font = 2)
+    # Fechas fuera de la barra (omitir inicio si no hay espacio)
+    if (x0 - as.numeric(x_min) > rango_x * 0.04)
+      text(x0, i, gdf$Start[i], pos = 2, cex = cex_date, font = 2)
+    text(x1, i, gdf$End[i], pos = 4, cex = cex_date, font = 2)
 
     # Rotulo eje Y — rectangulo del color de la campana, texto adaptado
-    rect_izq <- as.numeric(x_min) - lbl_w - lbl_sep
-    rect_der <- as.numeric(x_min) - lbl_sep
     rect(rect_izq, i - .35, rect_der, i + .35,
          col = bc, border = NA, xpd = TRUE)
-    text(rect_izq + rango_x * 0.005, i, gdf$label[i],
-         adj = c(0, 0.5), cex = .75, font = 2, col = tc, xpd = TRUE)
+    text(rect_izq + (rect_der - rect_izq) * 0.05, i, gdf$label[i],
+         adj = c(0, 0.5), cex = cex_lbl, font = 2, col = tc, xpd = TRUE)
   }
 
   # --- Ejes y titulo ---
-  axis(1, at = as.numeric(meses), labels = format(meses, "%b"), cex.axis = .8)
-  title(paste("IBTSWG NeAtl", year), font.main = 2, cex.main = 1.1)
-  box(bty = "l")
+  axis(1, at = as.numeric(meses), labels = format(meses, "%b"), cex.axis = cex_axis,
+       lwd = 0, lwd.ticks = 0.8)
+  title(paste("IBTSWG NeAtl", year), font.main = 2, cex.main = 1.2 * cex)
+  # Solo linea horizontal inferior (box bty='l' cortaria las etiquetas Y)
+  segments(as.numeric(x_min), 0.5, as.numeric(x_max), 0.5, col = "black", lwd = 1)
 
   invisible(gdf)
 }
