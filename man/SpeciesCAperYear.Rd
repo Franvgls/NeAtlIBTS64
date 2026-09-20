@@ -29,7 +29,7 @@ at length (CANoAtLngt) for that species.}
 \itemize{
 \item \code{"summary"} (default): data.frame with one row per species
 and columns \code{Name, Aphia, N_total, N_aged, pct_aged, Lmin,
-      Lmax, Amin, Amax, M, F, U}.
+    Lmax, Amin, Amax, M, F, U}.
 \item \code{"matrix"}: species x sex matrix of CA record counts
 (legacy behaviour).
 }}

@@ -7,8 +7,9 @@
 #' @param Survey: either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
-#' @param c.inta: the confidence interval to be used in the confint function for all data if only one sweep length, and for the short sweeps in case there are two
-#' @param c.intb: the confidence interval to be used in the confint function for the long set of sweeps.
+#' @param c.inta: the level (e.g. .95) of the band plotted for all data if only one sweep length, and for the short sweeps in case there are two
+#' @param c.intb: the level of the band plotted for the long set of sweeps
+#' @param int.type: "prediction" (default) plots the range where an individual haul is expected to fall, does not shrink with more data and is the appropriate choice for flagging hauls with an abnormal gear geometry; "confidence" plots the range for the mean curve, which shrinks as data accumulates; "both" plots both bands
 #' @param es: If T titles and labels are in Spanish, if FALSE in English
 #' @param col1: color for the symbols and lines for the whole set if only one set of sweeps are used, and for the data from the long set of sweeps.
 #' @param col2: color for the symbols and lines for the data from the short sweeps in case there are two.
@@ -24,7 +25,8 @@
 #' gearPlotHH.nodp(getICES=F,Survey=damb,years=c(2014:2016),quarter=4,pF=F)
 #' }
 #' @export
-gearPlotHH.nodpSH<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,es=FALSE,col1="darkblue",col2="steelblue2",esc.mult=1,getICES=TRUE,pF=TRUE,ti=TRUE) {
+gearPlotHH.nodpSH<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("prediction","confidence","both"),es=FALSE,col1="darkblue",col2="steelblue2",esc.mult=1,getICES=TRUE,pF=TRUE,ti=TRUE) {
+  int.type<-match.arg(int.type)
 ## get the data
     if (getICES) {
    dumb<-icesDatras::getDATRAS("HH",Survey,years,quarter)
@@ -52,12 +54,13 @@ gearPlotHH.nodpSH<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,es=FALSE,co
             a1<-round(coef(Netopening.log)[1],2)
             b1<-round(coef(Netopening.log)[2],2)
             lines(dp,a1+b1*log(dp),col=col1,lwd=2)
-            a1low<-confint(Netopening.log,level=c.inta)[1,1]
-            b1low<-confint(Netopening.log,level=c.inta)[2,1]
-            lines(dp,a1low+b1low*log(dp),col=col1,lty=2,lwd=1)
-            a1Upr<-confint(Netopening.log,level=c.inta)[1,2]
-            b1Upr<-confint(Netopening.log,level=c.inta)[2,2]
-            lines(dp,a1Upr+b1Upr*log(dp),col=col1,lty=2,lwd=1)
+            band<-gearBand(Netopening.log,"Depth",dp,level=c.inta,type=int.type)
+            lines(dp,band$lwr,col=col1,lty=2,lwd=1)
+            lines(dp,band$upr,col=col1,lty=2,lwd=1)
+            if (int.type=="both") {
+              lines(dp,band$lwr.conf,col=col1,lty=3,lwd=1)
+              lines(dp,band$upr.conf,col=col1,lty=3,lwd=1)
+            }
             if (pF) {
               points(Netopening~Depth,dumb,pch=21,bg=col1,lwd=1)
               # if (length(years)>1) legend("bottomright",c(paste0(years[1],"-",years[length(years)-1]),years[length(years)]),pch=c(1,21),col=c(col1),pt.bg=c(NA,col1),bty="n",inset=.02)
@@ -104,22 +107,24 @@ gearPlotHH.nodpSH<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,es=FALSE,co
            a1st<-round(coef(Netopeningst.log)[1],2)
            b1st<-round(coef(Netopeningst.log)[2],2)
            lines(dpst,a1st+b1st*log(dpst),col=col2,lwd=2)
-           a1lowst<-confint(Netopeningst.log,level=c.inta)[1,1]
-           b1lowst<-confint(Netopeningst.log,level=c.inta)[2,1]
-           lines(dpst,a1lowst+b1lowst*log(dpst),col=col2,lty=2,lwd=1)
-           a1Uprst<-confint(Netopeningst.log,level=c.inta)[1,2]
-           b1Uprst<-confint(Netopeningst.log,level=c.inta)[2,2]
-           lines(dpst,a1Uprst+b1Uprst*log(dpst),col=col2,lty=2,lwd=1)
+           bandst<-gearBand(Netopeningst.log,"Depth",dpst,level=c.inta,type=int.type)
+           lines(dpst,bandst$lwr,col=col2,lty=2,lwd=1)
+           lines(dpst,bandst$upr,col=col2,lty=2,lwd=1)
+           if (int.type=="both") {
+             lines(dpst,bandst$lwr.conf,col=col2,lty=3,lwd=1)
+             lines(dpst,bandst$upr.conf,col=col2,lty=3,lwd=1)
+           }
            legend("topleft",legend=substitute(SortVop == a1st + b1st %*% log(depth),list(a1st=round(coef(Netopeningst.log)[1],2),b1st=(round(coef(Netopeningst.log)[2],2)))),bty="n",text.font=2,inset=.05,cex=1*esc.mult)
            a1lg<-round(coef(Netopeninglg.log)[1],2)
            b1lg<-round(coef(Netopeninglg.log)[2],2)
            lines(dplg,a1lg+b1lg*log(dplg),col=col1,lwd=2)
-           a1lowlg<-confint(Netopeninglg.log,level=c.intb)[1,1]
-           b1lowlg<-confint(Netopeninglg.log,level=c.intb)[2,1]
-           lines(dplg,a1lowlg+b1lowlg*log(dplg),col=col1,lty=2,lwd=1)
-           a1Uprlg<-confint(Netopeninglg.log,level=c.intb)[1,2]
-           b1Uprlg<-confint(Netopeninglg.log,level=c.intb)[2,2]
-           lines(dplg,a1Uprlg+b1Uprlg*log(dplg),col=col1,lty=2,lwd=1)
+           bandlg<-gearBand(Netopeninglg.log,"Depth",dplg,level=c.intb,type=int.type)
+           lines(dplg,bandlg$lwr,col=col1,lty=2,lwd=1)
+           lines(dplg,bandlg$upr,col=col1,lty=2,lwd=1)
+           if (int.type=="both") {
+             lines(dplg,bandlg$lwr.conf,col=col1,lty=3,lwd=1)
+             lines(dplg,bandlg$upr.conf,col=col1,lty=3,lwd=1)
+           }
            legend("topright",legend=substitute(LongVop == a1lg + b1lg %*% log(depth),list(a1lg=round(coef(Netopeninglg.log)[1],2),b1lg=(round(coef(Netopeninglg.log)[2],2)))),bty="n",text.font=2,inset=.2,cex = 1*esc.mult)
            summary(Netopeningst.log)
            summary(Netopeninglg.log)

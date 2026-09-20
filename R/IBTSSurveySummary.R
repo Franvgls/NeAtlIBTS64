@@ -4,16 +4,17 @@
 #' @param surveys Named list con survey -> vector de quarters. Si NULL usa la
 #'   tabla por defecto del IBTSWG
 #' @param only_valid Si TRUE filtra solo HaulVal=="V"
-#' @param local_HH data.frame opcional en formato DATRAS HH con datos locales
-#'   (e.g. PT-IBTS Q4 no subido aun a DATRAS). Debe tener columnas \code{Survey}
-#'   y \code{Quarter}. Si hay filas para un \code{surv+q}, se usan en vez de
-#'   descargar de DATRAS y se omite el chequeo de disponibilidad para esa clave.
+#' @param local_HH data.frame en formato DATRAS HH con datos locales (ej. PT-IBTS Q4
+#'   no subido a DATRAS). Columnas \code{Survey} y \code{Quarter} obligatorias.
+#' @param extra_surveys Named list con surveys adicionales o forzados fuera de la
+#'   lista por defecto. Mismo formato: \code{list("NS-IBTS" = 1, "BALTIC" = c(1,4))}.
 #' @return Lista con un data.frame por survey y un data.frame resumen global
 #' @export
 IBTSSurveySummary <- function(year,
-                              surveys = NULL,
-                              only_valid = FALSE,
-                              local_HH   = NULL) {
+                              surveys       = NULL,
+                              only_valid    = FALSE,
+                              local_HH      = NULL,
+                              extra_surveys = NULL) {
 
   # Tabla por defecto: surveys conocidas del NeAtl IBTS y sus quarters
   if (is.null(surveys)) {
@@ -34,6 +35,17 @@ IBTSSurveySummary <- function(year,
     )
   }
 
+  # Merge extra_surveys
+  if (!is.null(extra_surveys)) {
+    for (sv in names(extra_surveys)) {
+      if (sv %in% names(surveys)) {
+        surveys[[sv]] <- unique(c(surveys[[sv]], extra_surveys[[sv]]))
+      } else {
+        surveys[[sv]] <- extra_surveys[[sv]]
+      }
+    }
+  }
+
   results <- list()
   summary_rows <- list()
 
@@ -42,33 +54,30 @@ IBTSSurveySummary <- function(year,
       key <- paste0(surv, "_Q", q)
       message("Descargando ", key, "...")
 
-      # Comprobar si hay datos locales para esta clave
+      # Datos locales tienen prioridad sobre DATRAS
       has_local <- !is.null(local_HH) &&
         any(local_HH$Survey == surv & local_HH$Quarter == as.character(q))
 
-      if (has_local) {
-        hh <- local_HH[local_HH$Survey == surv &
-                         local_HH$Quarter == as.character(q), ]
-        message("  -> HH de local_HH (", nrow(hh), " filas), omitiendo DATRAS.")
-      } else {
-        # Comprobar si existe el año Y el trimestre antes de descargar
-        quarters_ok <- tryCatch({
-          suppressMessages(suppressWarnings(
-            icesDatras::getSurveyYearQuarterList(surv, year)
-          ))
-        }, error = function(e) NULL)
-
+      if (!has_local) {
+        # try() en lugar de tryCatch por bug rbindlist/Doortype en icesDatras 1.4.1
+        quarters_ok <- try(suppressMessages(suppressWarnings(
+          icesDatras::getSurveyYearQuarterList(surv, year)
+        )), silent = TRUE)
+        if (inherits(quarters_ok, "try-error")) quarters_ok <- NULL
         if (is.null(quarters_ok) || !(q %in% quarters_ok)) {
           message("  Sin datos en DATRAS: ", key)
           next
         }
+      }
 
-        hh <- tryCatch({
-          suppressMessages(
-            suppressWarnings(
-              icesDatras::getHHdata(surv, year, q)
-            )
-          )
+      hh <- if (has_local) {
+        message("  -> HH de local_HH")
+        local_HH[local_HH$Survey == surv & local_HH$Quarter == as.character(q), ]
+      } else {
+        tryCatch({
+          suppressMessages(suppressWarnings(
+            icesDatras::getHHdata(surv, year, q)
+          ))
         },
         error   = function(e) { message("  Sin datos: ", surv, " Q", q); return(NULL) },
         warning = function(w) { message("  Aviso: ", surv, " Q", q, " - ", conditionMessage(w)); return(NULL) }

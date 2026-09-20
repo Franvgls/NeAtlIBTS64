@@ -11,6 +11,7 @@ gearPlotHHNS.wgdp(
   country,
   c.inta = 0.8,
   c.intb = 0.3,
+  int.type = c("prediction", "confidence", "both"),
   col1 = "darkblue",
   col2 = "steelblue2",
   getICES = T,
@@ -26,9 +27,11 @@ gearPlotHHNS.wgdp(
 
 \item{country:}{The country chosen to be plotted (checks if it's available in the HH file)}
 
-\item{c.inta:}{the confidence interval to be used in the confint function for long sweeps and for sweeps if there is only one length}
+\item{c.inta:}{the level (e.g. .95) of the band plotted for long sweeps and for sweeps if there is only one length}
 
-\item{c.intb:}{the confidence interval to be used in the confint function for short sweeps if there are two}
+\item{c.intb:}{the level of the band plotted for short sweeps if there are two}
+
+\item{int.type:}{"prediction" (default) plots the range where an individual haul is expected to fall, does not shrink with more data and is the appropriate choice for flagging hauls with an abnormal gear geometry; "confidence" plots the range for the mean curve, which shrinks as data accumulates; "both" plots both bands}
 
 \item{col1:}{color for the symbols and lines for the whole set if only one set of sweeps are used, and for the data from the long set of sweeps.}
 

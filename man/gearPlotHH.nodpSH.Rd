@@ -10,6 +10,7 @@ gearPlotHH.nodpSH(
   quarter,
   c.inta = 0.8,
   c.intb = 0.3,
+  int.type = c("prediction", "confidence", "both"),
   es = FALSE,
   col1 = "darkblue",
   col2 = "steelblue2",
@@ -26,9 +27,11 @@ gearPlotHH.nodpSH(
 
 \item{quarter:}{the quarter of the survey to be ploted}
 
-\item{c.inta:}{the confidence interval to be used in the confint function for all data if only one sweep length, and for the short sweeps in case there are two}
+\item{c.inta:}{the level (e.g. .95) of the band plotted for all data if only one sweep length, and for the short sweeps in case there are two}
 
-\item{c.intb:}{the confidence interval to be used in the confint function for the long set of sweeps.}
+\item{c.intb:}{the level of the band plotted for the long set of sweeps}
+
+\item{int.type:}{"prediction" (default) plots the range where an individual haul is expected to fall, does not shrink with more data and is the appropriate choice for flagging hauls with an abnormal gear geometry; "confidence" plots the range for the mean curve, which shrinks as data accumulates; "both" plots both bands}
 
 \item{es:}{If T titles and labels are in Spanish, if FALSE in English}
 

@@ -171,8 +171,11 @@ qcHaulsDist <- function(Survey = "NS-IBTS", years, quarter,
     draw_panel <- function(temp_c, ctry, error_var, error_lab,
                            show_country_main = TRUE) {
       err <- temp_c[[error_var]]
-      ylims <- max(abs(err), na.rm = TRUE) * 1.1
-      if (!is.finite(ylims) || ylims == 0) ylims <- 1
+      if (any(is.finite(err))) {
+        ylims <- max(abs(err), na.rm = TRUE) * 1.1
+      } else {
+        ylims <- 1
+      }
       n_valid <- sum(!is.na(err))
       n_na    <- sum(is.na(err))
 

@@ -43,7 +43,7 @@ safe_getDATRAS("HH", "SP-NORTH", 2022, 4, context = "console")
 }
 }
 \seealso{
-Other quality control: 
-\code{\link{qcHaulsDist}()}
+Other quality control:
+\code{\link[=qcHaulsDist]{qcHaulsDist()}}
 }
 \concept{quality control}

@@ -10,6 +10,7 @@ gearPlotHH.dodp(
   quarter,
   c.inta = 0.8,
   c.intb = 0.3,
+  int.type = c("prediction", "confidence", "both"),
   es = F,
   col1 = "darkblue",
   col2 = "steelblue2",
@@ -25,11 +26,11 @@ gearPlotHH.dodp(
 
 \item{quarter:}{the quarter of the survey to be plotted}
 
-\item{c.int:}{the confidenc interval to be used in the confint function}
+\item{c.inta:}{the level (e.g. .95) of the band plotted for all data if only one sweep length, and for the long sweeps in case there are two}
 
-\item{c.inta:}{the confidence interval to be used in the confint function for all data if only one sweep length, and for the short sweeps in case there are two}
+\item{c.intb:}{the level of the band plotted for the short set of sweeps in case there are two}
 
-\item{c.intb:}{the confidence interval to be used in the confint function for the long set of sweeps.}
+\item{int.type:}{"prediction" (default) plots the range where an individual haul is expected to fall, does not shrink with more data and is the appropriate choice for flagging hauls with an abnormal gear geometry; "confidence" plots the range for the mean curve, which shrinks as data accumulates; "both" plots both bands}
 
 \item{es:}{si T titulos y leyendas salen en Spanish, si no en ingles.}
 
@@ -44,7 +45,7 @@ gearPlotHH.dodp(
 \item{pF:}{takes out the points and leaves only the lines in the graphs}
 }
 \value{
-Produces a graph DoorSpread vs. Depth, it also includes information on the ship, the time series used, the models and parameters estimated.
+Produces a graph DoorSpread vs. Depth, it also includes information on the ship, the time series used, the models and parameters estimated. The band level and int.type actually used are labelled on the plot: a single label when c.inta and c.intb match, or one label per curve, in that curve's color, when they differ.
 }
 \description{
 Produces a DoorSpread vs. Depth plot and model with nls R function. Data are taken directly from DATRAS using function getDATRAS from library(icesDatras)

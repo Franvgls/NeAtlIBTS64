@@ -17,15 +17,15 @@ GrafAlk.NeAtl64(
 )
 }
 \arguments{
-\item{ed.tal}{\code{data.frame} con al menos columnas \code{LngtClasscm}
-y \code{Age}. Habitualmente la salida de
-\code{\link{GetAlkDTR.NeAtl64}}.}
+\item{ed.tal}{data.frame. Salida de \code{\link{GetAlkDTR.NeAtl64}}
+(formato agregado) o CA records con columnas \code{LngtClasscm}
+y \code{Age} (formato individual).}
 
-\item{plus}{Edad del grupo terminal; las edades >= plus se agrupan.}
+\item{plus}{Edad del grupo terminal. Solo se usa en formato individual;
+en formato agregado las columnas ya definen el plus.}
 
 \item{ti}{Título: \code{TRUE} construye el título a partir de los
-atributos del data.frame (survey, año, quarter, Aphia); un string
-con el título; \code{FALSE} sin título.}
+atributos del data.frame; string con el título; \code{FALSE} sin título.}
 
 \item{leg}{Lógico: dibujar leyenda de edades en la parte superior.}
 
@@ -37,8 +37,7 @@ con el título; \code{FALSE} sin título.}
 
 \item{cols}{Vector de colores (longitud plus+1); si NULL, rainbow.}
 
-\item{out.dat}{Si \code{TRUE} devuelve invisible la matriz de
-proporciones y los \emph{n} reales por talla.}
+\item{out.dat}{Si \code{TRUE} devuelve invisible \code{list(prop, n)}.}
 }
 \value{
 Invisible: \code{NULL}, o \code{list(prop, n)} si
@@ -46,27 +45,32 @@ Invisible: \code{NULL}, o \code{list(prop, n)} si
 }
 \description{
 Barras apiladas que suman 1 por talla, mostrando la composición por
-edad en cada clase de talla, usando datos individuales de otolitos
-descargados de DATRAS. Análoga a \code{grafalk.camp64} de CampR64
-pero adaptada al formato CA records.
+edad en cada clase de talla. Acepta dos formatos de entrada:
+\itemize{
+\item \strong{Formato agregado} (salida de \code{\link{GetAlkDTR.NeAtl64}}):
+data.frame con columnas \code{talla}, \code{sexo}, \code{E0}, ...,
+\code{Eplus+}. Mismo formato que \code{GetAlk.camp64}.
+\item \strong{Formato individual} (CA records crudos): data.frame con
+columnas \code{LngtClasscm} y \code{Age}, un registro por otolito.
+}
 }
 \examples{
 \dontrun{
-# Sardina, North Spain Q4 2023
-ca <- GetAlkDTR.NeAtl64("SP-NORTH", 2023, 4, Aphia = 126421)
-GrafAlk.NeAtl64(ca)
-GrafAlk.NeAtl64(ca, ti = "Sardina, SP-N 2023 Q4", es = FALSE)
+# Formato agregado — anidado directo
+GrafAlk.NeAtl64(GetAlkDTR.NeAtl64("SP-NORTH", 2022, 4, 127145))
 
-# Sardina con resolución de 0.5 cm
-ca05 <- GetAlkDTR.NeAtl64("SP-NORTH", 2023, 4,
-                           Aphia = 126421, by_cm = FALSE)
-GrafAlk.NeAtl64(ca05)
+# Guardando primero
+alk <- GetAlkDTR.NeAtl64("SP-NORTH", 2022, 4, Aphia = 127145)
+GrafAlk.NeAtl64(alk)
+GrafAlk.NeAtl64(alk, es = FALSE, ti = "L. boscii SP-N 2022 Q4")
 }
 }
 \seealso{
 \code{\link{GetAlkDTR.NeAtl64}}
 
-Other ALK DATRAS: 
-\code{\link{GetAlkDTR.NeAtl64}()}
+Other ALK DATRAS:
+\code{\link[=AuditAlkCAMP_DATRAS]{AuditAlkCAMP_DATRAS()}},
+\code{\link[=GetAlkDTR.NeAtl64]{GetAlkDTR.NeAtl64()}},
+\code{\link[=TalAge.NeAtl64]{TalAge.NeAtl64()}}
 }
 \concept{ALK DATRAS}

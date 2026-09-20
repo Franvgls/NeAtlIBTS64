@@ -7,9 +7,9 @@
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be plotted
 #' @param country: The country chosen to be plotted (checks if it's available in the HH file)
-#' @param c.int: the confidenc interval to be used in the confint function
-#' @param c.inta: the confidence interval to be used in the confint function for all data if only one sweep length, and for the short sweeps in case there are two
-#' @param c.intb: the confidence interval to be used in the confint function for the long set of sweeps.
+#' @param c.inta: the level (e.g. .95) of the band plotted for all data if only one sweep length, and for the long sweeps in case there are two
+#' @param c.intb: the level of the band plotted for the short set of sweeps in case there are two
+#' @param int.type: "prediction" (default) plots the range where an individual haul is expected to fall, does not shrink with more data and is the appropriate choice for flagging hauls with an abnormal gear geometry; "confidence" plots the range for the mean curve, which shrinks as data accumulates; "both" plots both bands
 #' @param col1: color for the symbols and lines for the whole set if only one set of sweeps are used, and for the data from the long set of sweeps.
 #' @param col2: color for the symbols and lines for the data from the short sweeps in case there are two.
 #' @param getICES: Should the data be downloaded from DATRAS? If T, default, the data are taken from DATRAS through the icesDatras package.
@@ -21,7 +21,8 @@
 #' gearPlotHHNS.dodp("NS-IBTS",c(2014:2017),3,"SCO",.8,.3,col1="darkblue",col2="darkgreen")
 #' }
 #' @export
-gearPlotHHNS.dodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.intb=.3,col1="darkblue",col2="steelblue2",getICES=T,pF=T) {
+gearPlotHHNS.dodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.intb=.3,int.type=c("prediction","confidence","both"),col1="darkblue",col2="steelblue2",getICES=T,pF=T) {
+  int.type<-match.arg(int.type)
   if (getICES) {
     dumb<-icesDatras::getDATRAS("HH",Survey,years,quarter)
   }
@@ -50,12 +51,13 @@ gearPlotHHNS.dodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
          a1<-round(coef(DoorSpread.log)[1],2)
          b1<-round(coef(DoorSpread.log)[2],2)
          lines(dp,a1+b1*log(dp),col=col1,lwd=2)
-         a1low<-confint(DoorSpread.log,level=c.inta)[1,1]
-         b1low<-confint(DoorSpread.log,level=c.inta)[2,1]
-         lines(dp,a1low+b1low*log(dp),col=col1,lty=2,lwd=1)
-         a1Upr<-confint(DoorSpread.log,level=c.inta)[1,2]
-         b1Upr<-confint(DoorSpread.log,level=c.inta)[2,2]
-         lines(dp,a1Upr+b1Upr*log(dp),col=col1,lty=2,lwd=1)
+         band<-gearBand(DoorSpread.log,"Depth",dp,level=c.inta,type=int.type)
+         lines(dp,band$lwr,col=col1,lty=2,lwd=1)
+         lines(dp,band$upr,col=col1,lty=2,lwd=1)
+         if (int.type=="both") {
+           lines(dp,band$lwr.conf,col=col1,lty=3,lwd=1)
+           lines(dp,band$upr.conf,col=col1,lty=3,lwd=1)
+         }
          legend("bottomright",legend=substitute(DS == a1 + b1 %*% log(depth),list(a1=round(coef(DoorSpread.log)[1],2),b1=(round(coef(DoorSpread.log)[2],2)))),bty="n",text.font=2,inset=.2)
 #         text("bottomleft",paste0(c(years[1],"-",years[length(years)])),inset=c(0,.1))
          dumbo<-bquote("Door Spread"== a + b %*% log("Depth"))
@@ -79,12 +81,13 @@ gearPlotHHNS.dodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
             a1st<-round(coef(DoorSpreadst.log)[1],2)
             b1st<-round(coef(DoorSpreadst.log)[2],2)
             lines(dpst,a1st+b1st*log(dpst),col=col2,lwd=2)
-            a1lowst<-confint(DoorSpreadst.log,level=c.intb)[1,1]
-            b1lowst<-confint(DoorSpreadst.log,level=c.intb)[2,1]
-            lines(dpst,a1lowst+b1lowst*log(dpst),col=col2,lty=2,lwd=1)
-            a1Uprst<-confint(DoorSpreadst.log,level=c.intb)[1,2]
-            b1Uprst<-confint(DoorSpreadst.log,level=c.intb)[2,2]
-            lines(dpst,a1Uprst+b1Uprst*log(dpst),col=col2,lty=2,lwd=1)
+            bandst<-gearBand(DoorSpreadst.log,"Depth",dpst,level=c.intb,type=int.type)
+            lines(dpst,bandst$lwr,col=col2,lty=2,lwd=1)
+            lines(dpst,bandst$upr,col=col2,lty=2,lwd=1)
+            if (int.type=="both") {
+              lines(dpst,bandst$lwr.conf,col=col2,lty=3,lwd=1)
+              lines(dpst,bandst$upr.conf,col=col2,lty=3,lwd=1)
+            }
             legend("bottomleft",legend=substitute(DSshort == a1st + b1st %*% log(depth),list(a1st=round(coef(DoorSpreadst.log)[1],2),b1st=(round(coef(DoorSpreadst.log)[2],2)))),bty="n",text.font=2,cex=.9,inset=c(.05,.2))
             if (pF) {
               points(DoorSpread~Depth,dumblong,subset=HaulVal=="V",pch=21,col=col1)
@@ -93,12 +96,13 @@ gearPlotHHNS.dodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
             a1lg<-round(coef(DoorSpreadlg.log)[1],2)
             b1lg<-round(coef(DoorSpreadlg.log)[2],2)
             lines(dplg,a1lg+b1lg*log(dplg),col=col1,lwd=2)
-            a1lowlg<-confint(DoorSpreadlg.log,level=c.inta)[1,1]
-            b1lowlg<-confint(DoorSpreadlg.log,level=c.inta)[2,1]
-            lines(dplg,a1lowlg+b1lowlg*log(dplg),col=col1,lty=2,lwd=1)
-            a1Uprlg<-confint(DoorSpreadlg.log,level=c.inta)[1,2]
-            b1Uprlg<-confint(DoorSpreadlg.log,level=c.inta)[2,2]
-            lines(dplg,a1Uprlg+b1Uprlg*log(dplg),col=col1,lty=2,lwd=1)
+            bandlg<-gearBand(DoorSpreadlg.log,"Depth",dplg,level=c.inta,type=int.type)
+            lines(dplg,bandlg$lwr,col=col1,lty=2,lwd=1)
+            lines(dplg,bandlg$upr,col=col1,lty=2,lwd=1)
+            if (int.type=="both") {
+              lines(dplg,bandlg$lwr.conf,col=col1,lty=3,lwd=1)
+              lines(dplg,bandlg$upr.conf,col=col1,lty=3,lwd=1)
+            }
             legend("topright",legend=substitute(DSlong == a1lg + b1lg %*% log(depth),list(a1lg=round(coef(DoorSpreadlg.log)[1],2),b1lg=(round(coef(DoorSpreadlg.log)[2],2)))),bty="n",text.font=2,cex=.9,inset=c(.01,.4))
 #         text("bottomleft",paste0(c(years[1],"-",years[length(years)])),inset=c(0,.1))
          dumbo<-bquote("Door Spread"== a + b %*% log("Depth"))

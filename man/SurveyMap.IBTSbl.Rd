@@ -63,7 +63,7 @@ SurveyMap.IBTS("FR-WCGFS",2023,3,ICESrect = T,ICESlab = T,ICESlabcex = .6)
 }
 }
 \seealso{
-Other maps: 
-\code{\link{SurveyMap.IBTS}()}
+Other maps:
+\code{\link[=SurveyMap.IBTS]{SurveyMap.IBTS()}}
 }
 \concept{maps}

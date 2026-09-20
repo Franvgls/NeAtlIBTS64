@@ -10,6 +10,7 @@ gearPlotHH.wgdp(
   quarter,
   c.inta = 0.8,
   c.intb = 0.3,
+  int.type = c("prediction", "confidence", "both"),
   es = FALSE,
   col1 = "darkblue",
   col2 = "steelblue2",
@@ -25,9 +26,11 @@ gearPlotHH.wgdp(
 
 \item{quarter:}{the quarter of the survey to be ploted}
 
-\item{c.inta:}{the confidence interval to be used in the confint function for long sweeps and for sweeps if there is only one length}
+\item{c.inta:}{the level (e.g. .95) of the band plotted for long sweeps and for sweeps if there is only one length}
 
-\item{c.intb:}{the confidence interval to be used in the confint function for short sweeps if there are two}
+\item{c.intb:}{the level of the band plotted for short sweeps if there are two}
+
+\item{int.type:}{"prediction" (default) plots the range where an individual haul is expected to fall, does not shrink with more data and is the appropriate choice for flagging hauls with an abnormal gear geometry; "confidence" plots the range for the mean curve, which shrinks as data accumulates; "both" plots both bands}
 
 \item{es:}{if TRUE all titles legends... are in Spanish, if FALSE in English}
 
@@ -42,7 +45,7 @@ gearPlotHH.wgdp(
 \item{ti:}{if F title will not be included automatically and can be addedd later}
 }
 \value{
-Produces a graph with WingSpread vs. Depth. it also includes information on the ship, the time series used, the models and parameters estimated.
+Produces a graph with WingSpread vs. Depth. it also includes information on the ship, the time series used, the models and parameters estimated. The band level and int.type actually used are labelled on the plot: a single label when c.inta and c.intb match, or one label per curve, in that curve's color, when they differ.
 }
 \description{
 Produces a WingSpread vs. DoorSpread plot and a model with nls R function. Data are taken directly from DATRAS using function getDATRAS from library(icesDatras)

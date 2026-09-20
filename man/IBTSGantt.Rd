@@ -4,7 +4,7 @@
 \alias{IBTSGantt}
 \title{Diagrama de Gantt de las campanas IBTS del Atlantico Nordeste}
 \usage{
-IBTSGantt(summary_df, year = NULL, IBTSsurvs = NULL)
+IBTSGantt(summary_df, year = NULL, IBTSsurvs = NULL, cex = 1)
 }
 \arguments{
 \item{summary_df}{data.frame con el resumen de IBTSSurveySummary(), o la lista completa}
@@ -12,6 +12,9 @@ IBTSGantt(summary_df, year = NULL, IBTSsurvs = NULL)
 \item{year}{anio del diagrama. Si NULL se infiere del summary}
 
 \item{IBTSsurvs}{data.frame con columnas survey y color (dataset del paquete). Si NULL colores por quarter}
+
+\item{cex}{Factor global de escala de texto. Default 1. Aumentar (ej. 1.4)
+para png de alta resolucion o presentaciones.}
 }
 \value{
 invisible: el data.frame ordenado usado para el grafico

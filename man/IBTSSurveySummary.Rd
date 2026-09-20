@@ -4,7 +4,13 @@
 \alias{IBTSSurveySummary}
 \title{Descarga y resume los datos HH de todas las campañas NeAtl IBTS de un año}
 \usage{
-IBTSSurveySummary(year, surveys = NULL, only_valid = FALSE, local_HH = NULL)
+IBTSSurveySummary(
+  year,
+  surveys = NULL,
+  only_valid = FALSE,
+  local_HH = NULL,
+  extra_surveys = NULL
+)
 }
 \arguments{
 \item{year}{Año a consultar}
@@ -14,10 +20,11 @@ tabla por defecto del IBTSWG}
 
 \item{only_valid}{Si TRUE filtra solo HaulVal=="V"}
 
-\item{local_HH}{data.frame opcional en formato DATRAS HH con datos locales
-(e.g. PT-IBTS Q4 no subido aun a DATRAS). Debe tener columnas \code{Survey}
-y \code{Quarter}. Si hay filas para un \code{surv+q}, se usan en vez de
-descargar de DATRAS y se omite el chequeo de disponibilidad para esa clave.}
+\item{local_HH}{data.frame en formato DATRAS HH con datos locales (ej. PT-IBTS Q4
+no subido a DATRAS). Columnas \code{Survey} y \code{Quarter} obligatorias.}
+
+\item{extra_surveys}{Named list con surveys adicionales o forzados fuera de la
+lista por defecto. Mismo formato: \code{list("NS-IBTS" = 1, "BALTIC" = c(1,4))}.}
 }
 \value{
 Lista con un data.frame por survey y un data.frame resumen global

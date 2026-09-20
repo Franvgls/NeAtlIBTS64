@@ -14,4 +14,3 @@ IBTSsurv
 List with the IBTS surveys not discontinued
 }
 \concept{Data info}
-\keyword{datasets}

@@ -1,6 +1,6 @@
 Package: NeAtlIBTS64
 Title: Scripts and functions for the IBTSNeAtl in 64bits 
-Version: 0.0.8
+Version: 0.1.0
 Authors@R: 
     person("Francisco", "Velasco", , "Franvgls@gmail.com", role = c("aut", "cre"),comment=c(ORCID="0000-0002-6420-9474"))
 Description: R 4.x port of NeAtlIBTS. Provides quality-control plotting and
@@ -12,7 +12,6 @@ Description: R 4.x port of NeAtlIBTS. Provides quality-control plotting and
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Imports: 
     dplyr,
     icesDatras,
@@ -36,3 +35,4 @@ Depends:
     R (>= 4.0)
 LazyData: true
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0

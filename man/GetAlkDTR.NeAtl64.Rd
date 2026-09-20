@@ -4,48 +4,66 @@
 \alias{GetAlkDTR.NeAtl64}
 \title{Construye la clave talla-edad desde DATRAS}
 \usage{
-GetAlkDTR.NeAtl64(survey, year, quarter, Aphia, by_cm = TRUE)
+GetAlkDTR.NeAtl64(
+  survey,
+  year,
+  quarter,
+  Aphia,
+  by_cm = TRUE,
+  plus = 8,
+  n.ots = FALSE
+)
 }
 \arguments{
-\item{survey}{Survey de DATRAS, p.ej. "SP-NORTH", "EVHOE", "IE-IGFS",
-"SP-PORC", "SP-ARSA", "PT-IBTS".}
+\item{survey}{Survey de DATRAS, p.ej. "SP-NORTH", "EVHOE", "IE-IGFS".}
 
 \item{year}{Año.}
 
 \item{quarter}{Trimestre (1-4).}
 
-\item{Aphia}{Valid_Aphia ID de la especie. Para sardina = 126421,
-merluza = 126484, etc. Ver \code{\link[worrms]{wm_records_taxamatch}}.}
+\item{Aphia}{Valid_Aphia ID de la especie.}
 
 \item{by_cm}{Lógico. Si TRUE (default) agrupa por cm enteros
-(\code{trunc(LngtClass/10)}). Si FALSE mantiene 0.5 cm
-(\code{LngtClass/10}).}
+(\code{trunc(LngtClass/10)}). Si FALSE mantiene 0.5 cm.}
 
-\item{rdx}{reduce los campos a los relacionados con la edad}
+\item{plus}{Edad del grupo terminal. Por defecto 8.}
+
+\item{n.ots}{Lógico. Si FALSE (default) devuelve proporciones por fila
+(ALK). Si TRUE devuelve conteos de otolitos.}
 }
 \value{
-\code{data.frame} con columnas \code{LngtClasscm}, \code{Age},
-y atributos \code{survey}, \code{year}, \code{quarter}, \code{Aphia}.
-Lista para pasarse directamente a \code{\link{grafalk.NeAtl64}}.
+\code{data.frame} con columnas \code{talla}, \code{sexo},
+\code{E0}, ..., \code{Eplus+}. Mismo formato que \code{GetAlk.camp64}.
+Incluye atributos \code{survey}, \code{year}, \code{quarter},
+\code{Aphia}, \code{by_cm} y \code{n_por_talla} (conteos, disponibles
+incluso cuando \code{n.ots = FALSE}, para mostrar el n en los gráficos).
 }
 \description{
 Descarga los datos CA (Age) de DATRAS para una especie, survey,
-año y trimestre concretos, y los reformatea en una tabla
-\code{data.frame} con \code{LngtClasscm} y \code{Age} lista
-para usar en \code{\link{grafalk.NeAtl64}}.
+año y trimestre concretos, y los agrega en una tabla talla x edad
+equivalente a la que devuelve \code{GetAlk.camp64} de CampR64.
+Una fila por clase de talla, columnas E0..Eplus+.
 }
 \examples{
 \dontrun{
-# Sardina, North Spain Q4 2023
-ca <- GetAlkDTR.NeAtl64("SP-NORTH", 2023, 4, Aphia = 126421)
-head(ca)
-grafalk.NeAtl64(ca)
+# ALK como proporciones (para graficar)
+alk <- GetAlkDTR.NeAtl64("SP-NORTH", 2022, 4, Aphia = 127145)
+GrafAlk.NeAtl64(alk)
+
+# Anidado directo — funciona gracias al atributo n_por_talla
+GrafAlk.NeAtl64(GetAlkDTR.NeAtl64("SP-NORTH", 2022, 4, 127145))
+
+# Conteos para comparar con GetAlk.camp64
+alk_n <- GetAlkDTR.NeAtl64("SP-NORTH", 2022, 4, 127145, n.ots = TRUE)
 }
 }
 \seealso{
-\code{\link{grafalk.NeAtl64}}
+\code{\link{GrafAlk.NeAtl64}}, \code{\link{SpeciesCAperYear}},
+\code{\link{AuditAlkCAMP_DATRAS}}
 
-Other ALK DATRAS: 
-\code{\link{GrafAlk.NeAtl64}()}
+Other ALK DATRAS:
+\code{\link[=AuditAlkCAMP_DATRAS]{AuditAlkCAMP_DATRAS()}},
+\code{\link[=GrafAlk.NeAtl64]{GrafAlk.NeAtl64()}},
+\code{\link[=TalAge.NeAtl64]{TalAge.NeAtl64()}}
 }
 \concept{ALK DATRAS}

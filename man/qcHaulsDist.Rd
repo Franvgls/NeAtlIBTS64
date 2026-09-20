@@ -22,49 +22,65 @@ qcHaulsDist(
 )
 }
 \arguments{
-\item{pc.error}{Acceptable error rate for not displaying hauls as erroneous}
+\item{Survey}{Either the survey name to download from DATRAS (see details),
+or a data.frame with HH information in DATRAS HH format.}
 
-\item{error.rb}{if FALSE does not take into account course errors}
+\item{years}{Years to download and use; must be available in DATRAS.}
 
-\item{allHauls}{Default is FALSE if TRUE lists values for all hauls, if not only those where pc.error>error}
+\item{quarter}{Quarter of the survey.}
 
-\item{graf}{if FALSE the graph goes to screen, if its a file name (i.e. "graf") a .png file with that name is created and a message with location (wd) is shown in screen.}
+\item{pc.error}{Acceptable error rate (in percent) for displaying hauls
+as erroneous.}
 
-\item{xpng}{width file png if graf is the name of the file}
+\item{error.rb}{If FALSE does not take into account course errors.}
 
-\item{ypng}{height file png if graf is the name of the file}
+\item{allHauls}{Default FALSE; if TRUE lists values for all hauls,
+otherwise only those where pc.error>error.}
 
-\item{ppng}{points png parameter if graf is the name of the file}
+\item{plots}{Logical; if TRUE produces graphics.}
 
-\item{Survey:}{either the Survey to be downloaded from DATRAS (see details), or a data frame with the HH information with  the DATRAS HH format  and the years and quarter selected in years and quarter}
+\item{getICES}{Logical. If TRUE (default), data are downloaded from DATRAS via
+icesDatras; if FALSE, uses the HH data.frame passed in as Survey.}
 
-\item{years:}{years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.}
+\item{error}{Which error to plot: "Dist", "Speed" or "Course".}
 
-\item{quarter:}{the quarter of the survey to be ploted}
+\item{esc.mult}{Multiplicative scale factor for cex of labels/axes.}
 
-\item{getICES:}{Should the data be downloaded from DATRAS? If T, default, the data are taken from DATRAS through the icesDatras package.}
+\item{graf}{If FALSE the graph goes to screen; if it is a file name
+(e.g. "graf") a .png file with that name is created.}
+
+\item{xpng}{Width of png in pixels.}
+
+\item{ypng}{Height of png in pixels.}
+
+\item{ppng}{Pointsize parameter for png.}
 }
 \value{
-data.frame with survey, haul, distance and estimated values different errors and hours of dawn/sunrise/dusk
+data.frame with survey, haul, distance, estimated values, different
+errors and times of dawn/sunrise/dusk.
 }
 \description{
 Produces different plots comparing expected values and those included.
-Data are taken directly from DATRAS using function getDATRAS from library(icesDatras)
-It only produces plots for surveys with HH files uploaded in DATRAS
+Data are taken directly from DATRAS using function getDATRAS from library(icesDatras).
+It only produces plots for surveys with HH files uploaded in DATRAS.
 }
 \details{
-Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
+Surveys available in DATRAS: NS-IBTS, SWC-IBTS, ROCKALL, NIGFS,
+IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS, SP-ARSA.
 }
 \examples{
 \dontrun{
-qcHaulsDist("SP-NORTH",c(2024),4,error="Speed"); qcHaulsDist("IE-IAMS",2024,quarter=c(1,1),error="Course")
+qcHaulsDist("SP-NORTH", 2024, 4, error = "Speed")
+qcHaulsDist("IE-IAMS", 2024, quarter = c(1, 1), error = "Course")
+qcHaulsDist("NS-IBTS", 2024, 1, error = "Speed")   # multi-country: one panel per country
 }
 }
 \references{
-distHaversine function gives the haversine calculation of distance between two geographic points \code{\link[geosphere]{distHaversine}}
+distHaversine function gives the haversine calculation of distance
+between two geographic points \code{\link[geosphere]{distHaversine}}
 }
 \seealso{
-Other quality control: 
-\code{\link{safe_getDATRAS}()}
+Other quality control:
+\code{\link[=safe_getDATRAS]{safe_getDATRAS()}}
 }
 \concept{quality control}

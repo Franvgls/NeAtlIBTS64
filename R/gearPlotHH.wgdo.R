@@ -7,16 +7,17 @@
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param datHH: an HH data object with Survey, Year and Quarter columns, overrides Survey, Years, Quarters
-#' @param c.int: the confidenc interval to be used in the confint function
-#' @param c.inta: the confidence interval to be used in the confint function for all data if only one sweep length, and for the short sweeps in case there are two
-#' @param c.intb: the confidence interval to be used in the confint function for the long set of sweeps.
+#' @param c.int: the level (e.g. .95) of the band plotted when there is only one sweep length
+#' @param c.inta: the level of the band plotted for the short sweeps in case there are two
+#' @param c.intb: the level of the band plotted for the long set of sweeps
+#' @param int.type: "prediction" (default) plots the range where an individual haul is expected to fall, does not shrink with more data and is the appropriate choice for flagging hauls with an abnormal gear geometry; "confidence" plots the range for the mean curve, which shrinks as data accumulates; "both" plots both bands
 #' @param es: If TRUE all labels and titles are in Spanish, if FALSE in English
 #' @param col1: color for the symbols and lines for the whole set if only one set of sweeps are used, and for the data from the long set of sweeps.
 #' @param col2: color for the symbols and lines for the data from the short sweeps in case there are two.
 #' @param pF: takes out the points and leaves only the lines in the graphs
 #' @param ti: if F title will not be included automatically and can be addedd later
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
-#' @return Produces a graph with DoorSpread vs. WingSpread, it also includes information on the ship, the time series used, the models and parameters estimated.
+#' @return Produces a graph with DoorSpread vs. WingSpread, it also includes information on the ship, the time series used, the models and parameters estimated. The band level and int.type actually used are labelled on the plot: a single label when c.inta and c.intb match, or one label per curve, in that curve's color, when they differ.
 #' @examples
 #' \dontrun{
 #' gearPlotHH.wgdo("SCOWCGFS",c(2014:2016),1,col1="darkblue",col2="steelblue3")
@@ -25,7 +26,8 @@
 #' gearPlotHH.wgdo("NIGFS",c(2015:2016),1)
 #' }
 #' @export
-gearPlotHH.wgdo<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,es=FALSE,col1="darkblue",col2="steelblue2",getICES=T,pF=T,ti=T) {
+gearPlotHH.wgdo<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,int.type=c("prediction","confidence","both"),es=FALSE,col1="darkblue",col2="steelblue2",getICES=T,pF=T,ti=T) {
+  int.type<-match.arg(int.type)
   if (getICES) {
     dumb<-icesDatras::getDATRAS(record = "HH",survey = Survey, year= years,quarter = quarter)
   }
@@ -64,15 +66,17 @@ gearPlotHH.wgdo<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,es=F
             ds<-data.frame(DoorSpread=seq(dspr[1],dspr[2],length.out = 10))
             pred <- predict(lm.WingVsDoor, newdata = ds)
             lines(pred~ds$DoorSpread,col=col1,lty=1,lwd=2)
-            a1low<-confint(lm.WingVsDoor,level=c.int)[1,1]
-            b1low<-confint(lm.WingVsDoor,level=c.int)[2,1]
-            lines(ds$DoorSpread,a1low+b1low*ds$DoorSpread,col= col1, lty=2,lwd=1)
-            a1Upr<-confint(lm.WingVsDoor,level=c.int)[1,2]
-            b1Upr<-confint(lm.WingVsDoor,level=c.int)[2,2]
-            lines(ds$DoorSpread,a1Upr+b1Upr*ds$DoorSpread,col=col1,lty=2,lwd=1)
+            band<-gearBand(lm.WingVsDoor,"DoorSpread",ds$DoorSpread,level=c.int,type=int.type)
+            lines(ds$DoorSpread,band$lwr,col=col1,lty=2,lwd=1)
+            lines(ds$DoorSpread,band$upr,col=col1,lty=2,lwd=1)
+            if (int.type=="both") {
+              lines(ds$DoorSpread,band$lwr.conf,col=col1,lty=3,lwd=1)
+              lines(ds$DoorSpread,band$upr.conf,col=col1,lty=3,lwd=1)
+            }
             #abline(lm.WingVsDoor,col=2,lty=2)
             legend("bottomright",legend=substitute(paste(WS == a + b %*% DS),list(a=round(coef(lm.WingVsDoor)[1],2),b=(round(coef(lm.WingVsDoor)[2],2)))),bty="n",text.font=2,inset=.2)
             legend("bottomright",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WingVsDoor)$adj.r.squared,2))),inset=c(.25,.15),cex=.9,bty="n")
+            mtext(gearIntLabel(c.int,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
             dumbo<-bquote("WS"== a + b %*% DS)
             mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
             }
@@ -108,22 +112,30 @@ gearPlotHH.wgdo<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,es=F
             dslong<-data.frame(DoorSpread=seq(dsprlng[1],dsprlng[2],length.out = 10))
             predlong <- predict(lm.WingVsDoor.long, newdata = dslong)
             lines(predlong~dslong$DoorSpread,col=col1,lty=1,lwd=2)
-            a1low.s<-confint(lm.WingVsDoor.short,level=c.inta)[1,1]
-            b1low.s<-confint(lm.WingVsDoor.short,level=c.inta)[2,1]
-            lines(dsshort$DoorSpread,a1low.s+b1low.s*dsshort$DoorSpread,col= col2, lty=2,lwd=1)
-            a1Upr.s<-confint(lm.WingVsDoor.short,level=c.inta)[1,2]
-            b1Upr.s<-confint(lm.WingVsDoor.short,level=c.inta)[2,2]
-            lines(dsshort$DoorSpread,a1Upr.s+b1Upr.s*dsshort$DoorSpread,col=col2,lty=2,lwd=1)
-            a1low.l<-confint(lm.WingVsDoor.long,level=c.intb)[1,1]
-            b1low.l<-confint(lm.WingVsDoor.long,level=c.intb)[2,1]
-            lines(dslong$DoorSpread,a1low.l+b1low.l*dslong$DoorSpread,col= col1, lty=2,lwd=1)
-            a1Upr.l<-confint(lm.WingVsDoor.long,level=c.intb)[1,2]
-            b1Upr.l<-confint(lm.WingVsDoor.long,level=c.intb)[2,2]
-            lines(dslong$DoorSpread,a1Upr.l+b1Upr.l*dslong$DoorSpread,col=col1,lty=2,lwd=1)
+            bandst<-gearBand(lm.WingVsDoor.short,"DoorSpread",dsshort$DoorSpread,level=c.inta,type=int.type)
+            lines(dsshort$DoorSpread,bandst$lwr,col=col2,lty=2,lwd=1)
+            lines(dsshort$DoorSpread,bandst$upr,col=col2,lty=2,lwd=1)
+            if (int.type=="both") {
+              lines(dsshort$DoorSpread,bandst$lwr.conf,col=col2,lty=3,lwd=1)
+              lines(dsshort$DoorSpread,bandst$upr.conf,col=col2,lty=3,lwd=1)
+            }
+            bandlg<-gearBand(lm.WingVsDoor.long,"DoorSpread",dslong$DoorSpread,level=c.intb,type=int.type)
+            lines(dslong$DoorSpread,bandlg$lwr,col=col1,lty=2,lwd=1)
+            lines(dslong$DoorSpread,bandlg$upr,col=col1,lty=2,lwd=1)
+            if (int.type=="both") {
+              lines(dslong$DoorSpread,bandlg$lwr.conf,col=col1,lty=3,lwd=1)
+              lines(dslong$DoorSpread,bandlg$upr.conf,col=col1,lty=3,lwd=1)
+            }
             legend("bottomleft",legend=substitute(paste(WSshort == a + b %*% DSshort),list(a=round(coef(lm.WingVsDoor.short)[1],2),b=(round(coef(lm.WingVsDoor.short)[2],2)))),inset=c(.09,.1),bty="n",text.font=2,text.col=col1)
             legend("bottomleft",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WingVsDoor.short)$adj.r.squared,2))),inset=c(.17,.04),cex=.9,bty="n",text.col=col1)
             legend("topright",legend=substitute(paste(WSlong == a + b %*% DSlong),list(a=round(coef(lm.WingVsDoor.long)[1],2),b=(round(coef(lm.WingVsDoor.long)[2],2)))),bty="n",text.font=2,inset=.05,text.col=col1)
             legend("topright",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WingVsDoor.long)$adj.r.squared,2))),inset=c(.15,.12),cex=.9,bty="n",text.col=col1)
+            if (isTRUE(all.equal(c.inta,c.intb))) {
+              mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+            } else {
+              legend("bottomleft",legend=gearIntLabel(c.inta,int.type),text.col=col2,bty="n",text.font=2,cex=1,inset=c(.09,.18))
+              legend("topright",legend=gearIntLabel(c.intb,int.type),text.col=col1,bty="n",text.font=2,cex=1,inset=c(.05,.2))
+            }
             dumbo<-bquote("WS"== a + b %*% DS)
             mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
          }
