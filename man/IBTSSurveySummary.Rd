@@ -21,7 +21,11 @@ tabla por defecto del IBTSWG}
 \item{only_valid}{Si TRUE filtra solo HaulVal=="V"}
 
 \item{local_HH}{data.frame en formato DATRAS HH con datos locales (ej. PT-IBTS Q4
-no subido a DATRAS). Columnas \code{Survey} y \code{Quarter} obligatorias.}
+no subido a DATRAS). Columnas \code{Survey} y \code{Quarter} obligatorias
+(\code{Survey} no viene en un export HH crudo: hay que anadirla a mano con
+el codigo exacto del survey, ej. \code{local_HH$Survey <- "PT-IBTS"}).
+Si faltan columnas, o si contiene datos de un Survey/Quarter que no se usa
+en ningun momento, se lanza un \code{warning()} avisando de ello.}
 
 \item{extra_surveys}{Named list con surveys adicionales o forzados fuera de la
 lista por defecto. Mismo formato: \code{list("NS-IBTS" = 1, "BALTIC" = c(1,4))}.}
