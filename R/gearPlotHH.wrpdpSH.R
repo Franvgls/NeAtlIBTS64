@@ -61,6 +61,7 @@ gearPlotHH.wrpdpSH<-function(Survey,years,quarter,incl2=TRUE,line=TRUE,c.inta=.9
        if (es) dumbo<-bquote("Cable"== a + b %*% Prof)
        else dumbo<-bquote("Warp"== a + b %*% Depth)
        mtext(dumbo,line=.4,side=3,cex=.8*esc.mult,font=2,adj=1)
+       mtext(paste0(round(c.inta*100),ifelse(es,"% Int. confianza/prediccion","% Confidence/prediction bands")),line=1.4,side=3,cex=.75*esc.mult,adj=1,col=col1)
      }
      if (pF) {
       legend("bottomright",legend="Hauls",pch=21,col=1,pt.bg=1,inset=.04,bty="n",cex = 1*esc.mult)

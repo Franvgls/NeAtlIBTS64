@@ -63,6 +63,7 @@ gearPlotHH.wrpdp<-function(Survey,years,quarter,incl2=TRUE,line=TRUE,c.inta=.95,
        if (es) dumbo<-bquote("Cable"== a + b %*% Prof)
        else dumbo<-bquote("Warp"== a + b %*% Depth)
        mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
+       mtext(paste0(round(c.inta*100),ifelse(es,"% Int. confianza/prediccion","% Confidence/prediction bands")),line=1.4,side=3,cex=.75,adj=1,col=col1)
      }
      if (pF) {
       if (length(years)>1) {legend("bottomright",legend=c(paste(years[length(years)]),paste0(years[1],"-",years[length(years)-1])),pch=c(21),col=c(1,col1),pt.bg=c(col1,NA),inset=.05,bty="n")}

@@ -29,7 +29,7 @@ gearPlotHHN21.wrpdp<-function(Survey="SP-NORTH",years=2021,quarter=4,incl2=TRUE,
   }
   if (!getICES) {
     dumb<-Survey
-    if (!all(unique(years) %i n% unique(dumb$Year))) stop(paste0("Not all years selected in years are present in the data.frame, check: ",unique(years)[which(!(unique(years) %in% unique(dumb$Year)))]))
+    if (!all(unique(years) %in% unique(dumb$Year))) stop(paste0("Not all years selected in years are present in the data.frame, check: ",unique(years)[which(!(unique(years) %in% unique(dumb$Year)))]))
     if (unique(dumb$Quarter)!=quarter) warning(paste0("Quarter selected ",quarter," is not available in the data.frame, check please"))
   }
   dumb<-if(incl2) dplyr::filter(dumb,HaulVal!="I") else dplyr::filter(dumb,HaulVal=="V")
@@ -70,6 +70,7 @@ gearPlotHHN21.wrpdp<-function(Survey="SP-NORTH",years=2021,quarter=4,incl2=TRUE,
        if (es) dumbo<-bquote("Cable largado"== a + b %*% Prof)
        else dumbo<-bquote("Warp"== a + b %*% Depth)
        mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
+       mtext(paste0(round(c.inta*100),ifelse(es,"% Int. confianza/prediccion","% Confidence/prediction bands")),line=1.4,side=3,cex=.75,adj=1)
        legend("topleft",legend=substitute(paste(Wrp.29VE == a + b %*% Dpth),list(a=round(coef(lm.WarpVsDepth.vde)[1],2),b=(round(coef(lm.WarpVsDepth.vde)[2],2)))),bty="n",text.font=2,inset=c(.01,.09),xjust=0)
        legend("topleft",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WarpVsDepth.vde)$adj.r.squared,2))),inset=c(.3,.09),xjust=0,cex=1,bty="n",col="red")
      }
