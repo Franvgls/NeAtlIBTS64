@@ -61,6 +61,7 @@ gearPlotHHNS.nodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
            }
            if (pF) {points(Netopening~Depth,dumb,subset=Year==years[length(years)],pch=21,bg=col1,lwd=1)}
            legend("topright",legend=substitute(NetOpening == a1 + b1 %*% log(depth),list(a1=round(coef(Netopening.log)[1],2),b1=(round(coef(Netopening.log)[2],2)))),bty="n",text.font=2,inset=.05)
+           mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
            dumbo<-bquote("Net vert. opening"== a + b %*% log("Depth"))
            summary(Netopening.log)
            }
@@ -102,6 +103,12 @@ gearPlotHHNS.nodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
              lines(dplg,bandlg$upr.conf,col=col1,lty=3,lwd=1)
            }
            legend("bottomright",legend=substitute(LongVop == a1lg + b1lg %*% log(depth),list(a1lg=round(coef(Netopeninglg.log)[1],2),b1lg=(round(coef(Netopeninglg.log)[2],2)))),bty="n",text.font=2,inset=.1)
+           if (isTRUE(all.equal(c.inta,c.intb))) {
+             mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+           } else {
+             legend("topleft",legend=gearIntLabel(c.inta,int.type),text.col=col2,bty="n",text.font=2,cex=1,inset=c(.05,.15))
+             legend("bottomright",legend=gearIntLabel(c.intb,int.type),text.col=col1,bty="n",text.font=2,cex=1,inset=c(.05,.2))
+           }
            summary(Netopeningst.log)
            summary(Netopeninglg.log)
            }

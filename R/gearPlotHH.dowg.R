@@ -76,17 +76,21 @@ gearPlotHH.dowg<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,int.
             pred <- predict(lm.DoorVsWing, newdata = ws)
             lines(pred~ws$WingSpread,col=col1,lty=1,lwd=2)
             band<-gearBand(lm.DoorVsWing,"WingSpread",ws$WingSpread,level=c.int,type=int.type)
-            lines(ws$WingSpread,band$lwr,col=col1,lty=2,lwd=1)
-            lines(ws$WingSpread,band$upr,col=col1,lty=2,lwd=1)
-            if (int.type=="both") {
-              lines(ws$WingSpread,band$lwr.conf,col=col1,lty=3,lwd=1)
-              lines(ws$WingSpread,band$upr.conf,col=col1,lty=3,lwd=1)
+            if (int.type %in% c("prediction","both")) {
+              lines(ws$WingSpread,band$lwr,col=col1,lty=2,lwd=1)
+              lines(ws$WingSpread,band$upr,col=col1,lty=2,lwd=1)
+            }
+            if (int.type %in% c("confidence","both")) {
+              lty.conf<-if (int.type=="both") 3 else 2
+              lines(ws$WingSpread,band$lwr.conf,col=col1,lty=lty.conf,lwd=1)
+              lines(ws$WingSpread,band$upr.conf,col=col1,lty=lty.conf,lwd=1)
             }
             #abline(lm.DoorVsWing,col=2,lty=2)
             legend("bottomright",legend=substitute(paste(DS == a + b %*% WS),list(a=round(coef(lm.DoorVsWing)[1],2),b=(round(coef(lm.DoorVsWing)[2],2)))),bty="n",text.font=2,inset=.2)
             legend("bottomright",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.DoorVsWing)$adj.r.squared,2))),inset=c(.25,.15),cex=.9,bty="n")
             dumbo<-bquote("DS"== a + b %*% WS)
             mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
+            mtext(gearIntLabel(c.int,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
             }
          if (length(levels(factor(dumb$SweepLngt)))==2) {
            if (length(years)>1) {
@@ -118,19 +122,24 @@ gearPlotHH.dowg<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,int.
             wslong<-data.frame(WingSpread=seq(wsprlng[1],wsprlng[2],length.out = 10))
             predlong <- predict(lm.DoorVsWing.long, newdata = wslong)
             lines(predlong~wslong$WingSpread,col=col1,lty=1,lwd=2)
+            lty.conf<-if (int.type=="both") 3 else 2
             bandst<-gearBand(lm.DoorVsWing.short,"WingSpread",wsshort$WingSpread,level=c.inta,type=int.type)
-            lines(wsshort$WingSpread,bandst$lwr,col=col2,lty=2,lwd=1)
-            lines(wsshort$WingSpread,bandst$upr,col=col2,lty=2,lwd=1)
-            if (int.type=="both") {
-              lines(wsshort$WingSpread,bandst$lwr.conf,col=col2,lty=3,lwd=1)
-              lines(wsshort$WingSpread,bandst$upr.conf,col=col2,lty=3,lwd=1)
+            if (int.type %in% c("prediction","both")) {
+              lines(wsshort$WingSpread,bandst$lwr,col=col2,lty=2,lwd=1)
+              lines(wsshort$WingSpread,bandst$upr,col=col2,lty=2,lwd=1)
+            }
+            if (int.type %in% c("confidence","both")) {
+              lines(wsshort$WingSpread,bandst$lwr.conf,col=col2,lty=lty.conf,lwd=1)
+              lines(wsshort$WingSpread,bandst$upr.conf,col=col2,lty=lty.conf,lwd=1)
             }
             bandlg<-gearBand(lm.DoorVsWing.long,"WingSpread",wslong$WingSpread,level=c.intb,type=int.type)
-            lines(wslong$WingSpread,bandlg$lwr,col=col1,lty=2,lwd=1)
-            lines(wslong$WingSpread,bandlg$upr,col=col1,lty=2,lwd=1)
-            if (int.type=="both") {
-              lines(wslong$WingSpread,bandlg$lwr.conf,col=col1,lty=3,lwd=1)
-              lines(wslong$WingSpread,bandlg$upr.conf,col=col1,lty=3,lwd=1)
+            if (int.type %in% c("prediction","both")) {
+              lines(wslong$WingSpread,bandlg$lwr,col=col1,lty=2,lwd=1)
+              lines(wslong$WingSpread,bandlg$upr,col=col1,lty=2,lwd=1)
+            }
+            if (int.type %in% c("confidence","both")) {
+              lines(wslong$WingSpread,bandlg$lwr.conf,col=col1,lty=lty.conf,lwd=1)
+              lines(wslong$WingSpread,bandlg$upr.conf,col=col1,lty=lty.conf,lwd=1)
             }
             legend("bottomleft",legend=substitute(paste(DSshort == a + b %*% WSshort),list(a=round(coef(lm.DoorVsWing.short)[1],2),b=(round(coef(lm.DoorVsWing.short)[2],2)))),inset=c(.09,.1),bty="n",text.font=2,text.col=col1)
             legend("bottomleft",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.DoorVsWing.short)$adj.r.squared,2))),inset=c(.17,.04),cex=.9,bty="n",text.col=col1)
@@ -138,6 +147,12 @@ gearPlotHH.dowg<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,int.
             legend("topright",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.DoorVsWing.long)$adj.r.squared,2))),inset=c(.15,.12),cex=.9,bty="n",text.col=col1)
             dumbo<-bquote("WS"== a + b %*% DS)
             mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
+            if (isTRUE(all.equal(c.inta,c.intb))) {
+              mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+            } else {
+              legend("topleft",legend=gearIntLabel(c.inta,int.type),text.col=col2,bty="n",text.font=2,cex=1,inset=c(.01,.02))
+              legend("topleft",legend=gearIntLabel(c.intb,int.type),text.col=col1,bty="n",text.font=2,cex=1,inset=c(.01,.09))
+            }
          }
    } else {stop("No records with DoorSpread>0")}
   yearsb<-unique(dplyr::filter(dumb,!is.na(dumb$WingSpread) & dumb$WingSpread>0)$Year)

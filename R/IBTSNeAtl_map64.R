@@ -86,6 +86,13 @@ IBTSNeAtl_map64 <- function(xlims = NULL, ylims = NULL,
     world_db <- "world"
   }
 
+  if (identical(shpdir, "") || !dir.exists(shpdir)) {
+    stop("No se pudo localizar la carpeta 'shapes' del paquete (shpdir=\"", shpdir, "\"). ",
+         "Esto suele pasar cuando la funcion se carga con source() en vez de con ",
+         "library(NeAtlIBTS64) o devtools::load_all(), ya que asi R no encuentra los ",
+         "ficheros internos del paquete via system.file(). Carga el paquete completo, ",
+         "o pasa la ruta a mano con shpdir=\"<ruta a inst/shapes>\".", call. = FALSE)
+  }
   shpdir <- normalizePath(shpdir, mustWork = FALSE)
 
   # --- Funcion interna de lectura ---

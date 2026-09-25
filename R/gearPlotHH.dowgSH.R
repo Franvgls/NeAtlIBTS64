@@ -79,6 +79,7 @@ gearPlotHH.dowgSH<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,in
             legend("bottomright",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.DoorVsWing)$adj.r.squared,2))),inset=c(.25,.15),cex=.9*esc.mult,bty="n")
             dumbo<-bquote("DS"== a + b %*% WS)
             mtext(dumbo,line=.4,side=3,cex=.8*esc.mult,font=2,adj=1)
+            mtext(gearIntLabel(c.int,int.type),side=1,line=-1.1,adj=.99,cex=1*esc.mult,font=2)
             }
          if (length(levels(factor(dumb$SweepLngt)))==2) {
            if (length(years)>1) {
@@ -134,6 +135,12 @@ gearPlotHH.dowgSH<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,in
             legend("topright",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.DoorVsWing.long)$adj.r.squared,2))),inset=c(.15,.12),cex=.9*esc.mult,bty="n",text.col=col1)
             dumbo<-bquote("WS"== a + b %*% DS)
             mtext(dumbo,line=.4,side=3,cex=.8*esc.mult,font=2,adj=1)
+            if (isTRUE(all.equal(c.inta,c.intb))) {
+              mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1*esc.mult,font=2)
+            } else {
+              legend("topleft",legend=gearIntLabel(c.inta,int.type),text.col=col2,bty="n",text.font=2,cex=1*esc.mult,inset=c(.01,.02))
+              legend("topleft",legend=gearIntLabel(c.intb,int.type),text.col=col1,bty="n",text.font=2,cex=1*esc.mult,inset=c(.01,.09))
+            }
          }
    } else {stop("No records with DoorSpread>0")}
   yearsb<-unique(dplyr::filter(dumb,!is.na(dumb$WingSpread) & dumb$WingSpread>0)$Year)

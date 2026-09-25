@@ -59,6 +59,7 @@ gearPlotHHNS.dodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
            lines(dp,band$upr.conf,col=col1,lty=3,lwd=1)
          }
          legend("bottomright",legend=substitute(DS == a1 + b1 %*% log(depth),list(a1=round(coef(DoorSpread.log)[1],2),b1=(round(coef(DoorSpread.log)[2],2)))),bty="n",text.font=2,inset=.2)
+         mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
 #         text("bottomleft",paste0(c(years[1],"-",years[length(years)])),inset=c(0,.1))
          dumbo<-bquote("Door Spread"== a + b %*% log("Depth"))
          mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
@@ -104,6 +105,12 @@ gearPlotHHNS.dodp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
               lines(dplg,bandlg$upr.conf,col=col1,lty=3,lwd=1)
             }
             legend("topright",legend=substitute(DSlong == a1lg + b1lg %*% log(depth),list(a1lg=round(coef(DoorSpreadlg.log)[1],2),b1lg=(round(coef(DoorSpreadlg.log)[2],2)))),bty="n",text.font=2,cex=.9,inset=c(.01,.4))
+            if (isTRUE(all.equal(c.inta,c.intb))) {
+              mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+            } else {
+              legend("bottomleft",legend=gearIntLabel(c.intb,int.type),text.col=col2,bty="n",text.font=2,cex=1,inset=c(.05,.08))
+              legend("topright",legend=gearIntLabel(c.inta,int.type),text.col=col1,bty="n",text.font=2,cex=1,inset=c(.01,.55))
+            }
 #         text("bottomleft",paste0(c(years[1],"-",years[length(years)])),inset=c(0,.1))
          dumbo<-bquote("Door Spread"== a + b %*% log("Depth"))
          mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)

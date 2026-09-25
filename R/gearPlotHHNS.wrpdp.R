@@ -8,7 +8,8 @@
 #' @param quarter: the quarter of the survey to be ploted
 #' @param country: The country chosen to be plotted (checks if it's available in the HH file)
 #' @param line: includes a regression line between Warp and depth and the formula of the linear regression. If F the line is omited
-#' @param c.inta: the confidence interval to be used in the predict.lm function
+#' @param c.inta: the level (e.g. .95) of the band plotted, passed to \code{\link{gearBand}}
+#' @param int.type: "prediction" (default) plots the range where an individual haul is expected to fall, does not shrink with more data and is the appropriate choice for flagging hauls with an abnormal gear geometry; "confidence" plots the range for the mean curve, which shrinks as data accumulates; "both" plots both bands
 #' @param col1: the color of the points, last year fill and previous years empty symbol
 #' @param getICES: Should the data be downloaded from DATRAS? If T, default, the data are taken from DATRAS through the icesDatras package.
 #' @param pF: takes out the points and leaves only the lines in the graphs
@@ -20,7 +21,8 @@
 #' gearPlotHHNS.wrpdp("NS-IBTS",c(2014:2017),1,"SWE")
 #' }
 #' @export
-gearPlotHHNS.wrpdp<-function(Survey="NS-IBTS",years,quarter,country,line=T,c.inta=.85,col1="darkblue",getICES=T,pF=T) {
+gearPlotHHNS.wrpdp<-function(Survey="NS-IBTS",years,quarter,country,line=T,c.inta=.85,int.type=c("prediction","confidence","both"),col1="darkblue",getICES=T,pF=T) {
+  int.type<-match.arg(int.type)
   if (getICES) {
     dumb<-icesDatras::getDATRAS("HH",Survey,years,quarter)
   }
@@ -46,19 +48,22 @@ gearPlotHHNS.wrpdp<-function(Survey="NS-IBTS",years,quarter,country,line=T,c.int
      if (line) {
        lm.WarpVsDepth<-lm(Warplngt~Depth,dumb,subset=HaulVal=="V" & Warplngt > c(0) & Depth> c(0))
        dpt<-data.frame(Depth=seq(dpthA[1],dpthA[2],length.out = 100))
-       pred.plim<-predict(lm.WarpVsDepth,newdata=dpt,interval="prediction",level=c.inta)
-       pred.clim<-predict(lm.WarpVsDepth,newdata=dpt,interval="confidence",level=c.inta)
-       matlines(dpt$Depth,cbind(pred.clim,pred.plim[,-1]),lty=c(1,2,2,2,2),lwd=c(2,1,1,1,1),col=col1)
-       # lines(dpt$Depth,predCI$fit[,"upr"],col="red",lwd=2,lty=2)
-       # lines(dpt$Depth,predCI.2[,"upr"],col="green",lwd=2,lty=2)
-       # lines(dpt$Depth,predCI.3[,"upr"],col="yellow",lwd=2,lty=2)
-       # lines(pred~dpt$Depth,col=col1,lty=1,lwd=2)
-       # lines(dpt$Depth,predCI[,"upr"],col=col1,lwd=1,lty=2)
-       # lines(dpt$Depth,predCI[,"lwr"],col=col1,lwd=1,lty=2)
+       band<-gearBand(lm.WarpVsDepth,"Depth",dpt$Depth,level=c.inta,type=int.type)
+       lines(dpt$Depth,band$fit,col=col1,lwd=2)
+       if (int.type %in% c("prediction","both")) {
+         lines(dpt$Depth,band$lwr,col=col1,lty=2,lwd=1)
+         lines(dpt$Depth,band$upr,col=col1,lty=2,lwd=1)
+       }
+       if (int.type %in% c("confidence","both")) {
+         lty.conf<-if (int.type=="both") 3 else 2
+         lines(dpt$Depth,band$lwr.conf,col=col1,lty=lty.conf,lwd=1)
+         lines(dpt$Depth,band$upr.conf,col=col1,lty=lty.conf,lwd=1)
+       }
        legend("topleft",legend=substitute(paste(Wrp == a + b %*% Dpth),list(a=round(coef(lm.WarpVsDepth)[1],2),b=(round(coef(lm.WarpVsDepth)[2],2)))),bty="n",text.font=2,inset=.05,xjust=0)
        legend("topleft",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WarpVsDepth)$adj.r.squared,2))),inset=c(.2,.1),xjust=0.5,cex=.9,bty="n")
        dumbo<-bquote("Warp"== a + b %*% Depth)
        mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
+       mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
      }
      if (pF) {
         if (length(years)>1) {legend("bottomright",legend=c(paste("Hauls",years[length(years)]),"Previous hauls"),pch=c(21),col=c(1,col1),pt.bg=c(col1,NA),inset=.05,bty="n")}

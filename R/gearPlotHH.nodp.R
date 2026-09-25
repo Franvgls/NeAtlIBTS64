@@ -72,8 +72,8 @@ gearPlotHH.nodp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("p
               }
             legend("topright",legend=substitute(NetOpening == a1 + b1 %*% log(depth),list(a1=round(coef(Netopening.log)[1],2),b1=(round(coef(Netopening.log)[2],2)))),bty="n",text.font=2,inset=.05)
             mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
-            if (es) dumbo<-bquote("Abertura vertial red"== a + b %*% log("Prof"))
-            else dumbo<-bquote("Net vert. opening"== a + b %*% log())
+            if (es) dumbo<-bquote("Net vert. opening"== a + b %*% log())
+            else dumbo<-bquote("Abertura vertical red"== a + b %*% log("Prof"))
             summary(Netopening.log)
           }
           if (length(levels(dumb$sweeplngt))==2) {
@@ -138,8 +138,8 @@ gearPlotHH.nodp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("p
            summary(Netopeningst.log)
            summary(Netopeninglg.log)
            }
-           if (es) dumbo<-bquote("Net Vert. opening"== a + b %*% log("Depth"))
-           else dumbo<-bquote("Abertura vertical red"== a + b %*% log("Prof"))
+           if (es) dumbo<-bquote("Abertura vertical red"== a + b %*% log("Prof"))
+           else dumbo<-bquote("Net Vert. opening"== a + b %*% log("Depth"))
            mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
       }
   yearsb<-unique(dumb[c(!is.na(dumb$DoorSpread) & dumb$DoorSpread>0),]$Year)

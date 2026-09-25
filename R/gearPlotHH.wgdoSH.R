@@ -75,6 +75,7 @@ gearPlotHH.wgdoSH<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,in
             #abline(lm.WingVsDoor,col=2,lty=2)
             legend("bottomright",legend=substitute(paste(WS == a + b %*% DS),list(a=round(coef(lm.WingVsDoor)[1],2),b=(round(coef(lm.WingVsDoor)[2],2)))),bty="n",text.font=2,inset=.2,cex=1*esc.mult)
             legend("bottomright",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WingVsDoor)$adj.r.squared,2))),inset=c(.25,.15),bty="n",cex=1*esc.mult)
+            mtext(gearIntLabel(c.int,int.type),side=1,line=-1.1,adj=.99,cex=1*esc.mult,font=2)
             dumbo<-bquote("WS"== a + b %*% DS)
             mtext(dumbo,line=.4,side=3,cex=.8*esc.mult,font=2,adj=1)
             }
@@ -131,6 +132,12 @@ gearPlotHH.wgdoSH<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,in
             legend("bottomleft",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WingVsDoor.short)$adj.r.squared,2))),inset=c(.17,.04),bty="n",text.col=col1,cex=1*esc.mult)
             legend("topright",legend=substitute(paste(WSlong == a + b %*% DSlong),list(a=round(coef(lm.WingVsDoor.long)[1],2),b=(round(coef(lm.WingVsDoor.long)[2],2)))),bty="n",text.font=2,inset=.05,text.col=col1,cex=1*esc.mult)
             legend("topright",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WingVsDoor.long)$adj.r.squared,2))),inset=c(.15,.12),bty="n",text.col=col1,cex=1*esc.mult)
+            if (isTRUE(all.equal(c.inta,c.intb))) {
+              mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1*esc.mult,font=2)
+            } else {
+              legend("bottomleft",legend=gearIntLabel(c.inta,int.type),text.col=col2,bty="n",text.font=2,cex=1*esc.mult,inset=c(.09,.18))
+              legend("topright",legend=gearIntLabel(c.intb,int.type),text.col=col1,bty="n",text.font=2,cex=1*esc.mult,inset=c(.05,.2))
+            }
             dumbo<-bquote("WS"== a + b %*% DS)
             mtext(dumbo,line=.4,side=3,cex=.8*esc.mult,font=2,adj=1)
          }

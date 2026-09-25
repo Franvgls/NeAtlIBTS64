@@ -7,7 +7,8 @@
 #' @param years: years to be downloaded and used, had to be available in DATRAS. The time series will be ploted in grey dots, last year in steelblue2, it depends on the order of years, not the actual chronological year.
 #' @param quarter: the quarter of the survey to be ploted
 #' @param line: includes a regression line between Warp and depth and the formula of the linear regression. If F the line is omited
-#' @param c.inta: the confidence interval to be used in the predict.lm function
+#' @param c.inta: the level (e.g. .95) of the band plotted, passed to \code{\link{gearBand}}
+#' @param int.type: "prediction" (default) plots the range where an individual haul is expected to fall, does not shrink with more data and is the appropriate choice for flagging hauls with an abnormal gear geometry; "confidence" plots the range for the mean curve, which shrinks as data accumulates; "both" plots both bands
 #' @param es: if TRUE labels and axes labels, titles legends in Spanish, if FALSE in English
 #' @param col1: the color of the points, last year fill and previous years empty symbol
 #' @param getICES: Should the data be downloaded from DATRAS? If T, default, the data are taken from DATRAS through the icesDatras package.
@@ -23,7 +24,8 @@
 #' gearPlotHH.wrpdp(damb,c(2014:2016),4,getICES=F,pF=F)
 #' }
 #' @export
-gearPlotHHN21.wrpdp<-function(Survey="SP-NORTH",years=2021,quarter=4,incl2=TRUE,line=TRUE,c.inta=.95,es=FALSE,col1="darkblue",col2="red",getICES=TRUE,pF=TRUE,ti=TRUE) {
+gearPlotHHN21.wrpdp<-function(Survey="SP-NORTH",years=2021,quarter=4,incl2=TRUE,line=TRUE,c.inta=.95,int.type=c("prediction","confidence","both"),es=FALSE,col1="darkblue",col2="red",getICES=TRUE,pF=TRUE,ti=TRUE) {
+  int.type<-match.arg(int.type)
   if (getICES) {
     dumb<-icesDatras::getDATRAS("HH",Survey,years,quarter)
   }
@@ -53,24 +55,33 @@ gearPlotHHN21.wrpdp<-function(Survey="SP-NORTH",years=2021,quarter=4,incl2=TRUE,
        lm.WarpVsDepth.vde<-lm(Warplngt~Depth,dumbvde,subset=c(Warplngt > c(0) & Depth> c(0)))
        dptmol<-data.frame(Depth=seq(dpthmol[1],dpthmol[2],length.out = 100))
        dptvde<-data.frame(Depth=seq(dpthvde[1],dpthvde[2],length.out = 100))
-       pred.plimmo<-predict(lm.WarpVsDepth.mol,newdata=dptmol,interval="prediction",level=c.inta)
-       pred.climmo<-predict(lm.WarpVsDepth.mol,newdata=dptmol,interval="confidence",level=c.inta)
-       matlines(dptmol$Depth,cbind(pred.climmo,pred.plimmo[,-1]),lty=c(1,2,2,2,2),lwd=c(2,1,1,1,1),col=col1)
-       pred.plimve<-predict(lm.WarpVsDepth.vde,newdata=dptvde,interval="prediction",level=c.inta)
-       pred.climve<-predict(lm.WarpVsDepth.vde,newdata=dptvde,interval="confidence",level=c.inta)
-       matlines(dptvde$Depth,cbind(pred.climve,pred.plimve[,-1]),lty=c(1,2,2,2,2),lwd=c(2,1,1,1,1),col=col2)
-       # lines(dpt$Depth,predCI$fit[,"upr"],col="red",lwd=2,lty=2)
-       # lines(dpt$Depth,predCI.2[,"upr"],col="green",lwd=2,lty=2)
-       # lines(dpt$Depth,predCI.3[,"upr"],col="yellow",lwd=2,lty=2)
-       # lines(pred~dpt$Depth,col=col1,lty=1,lwd=2)
-       # lines(dpt$Depth,predCI[,"upr"],col=col1,lwd=1,lty=2)
-       # lines(dpt$Depth,predCI[,"lwr"],col=col1,lwd=1,lty=2)
+       lty.conf<-if (int.type=="both") 3 else 2
+       bandmol<-gearBand(lm.WarpVsDepth.mol,"Depth",dptmol$Depth,level=c.inta,type=int.type)
+       lines(dptmol$Depth,bandmol$fit,col=col1,lwd=2)
+       if (int.type %in% c("prediction","both")) {
+         lines(dptmol$Depth,bandmol$lwr,col=col1,lty=2,lwd=1)
+         lines(dptmol$Depth,bandmol$upr,col=col1,lty=2,lwd=1)
+       }
+       if (int.type %in% c("confidence","both")) {
+         lines(dptmol$Depth,bandmol$lwr.conf,col=col1,lty=lty.conf,lwd=1)
+         lines(dptmol$Depth,bandmol$upr.conf,col=col1,lty=lty.conf,lwd=1)
+       }
+       bandvde<-gearBand(lm.WarpVsDepth.vde,"Depth",dptvde$Depth,level=c.inta,type=int.type)
+       lines(dptvde$Depth,bandvde$fit,col=col2,lwd=2)
+       if (int.type %in% c("prediction","both")) {
+         lines(dptvde$Depth,bandvde$lwr,col=col2,lty=2,lwd=1)
+         lines(dptvde$Depth,bandvde$upr,col=col2,lty=2,lwd=1)
+       }
+       if (int.type %in% c("confidence","both")) {
+         lines(dptvde$Depth,bandvde$lwr.conf,col=col2,lty=lty.conf,lwd=1)
+         lines(dptvde$Depth,bandvde$upr.conf,col=col2,lty=lty.conf,lwd=1)
+       }
        legend("topleft",legend=substitute(paste(Wrp.29MO == a + b %*% Dpth),list(a=round(coef(lm.WarpVsDepth.mol)[1],2),b=(round(coef(lm.WarpVsDepth.mol)[2],2)))),bty="n",text.font=2,inset=c(.01,.02),xjust=0)
        legend("topleft",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WarpVsDepth.mol)$adj.r.squared,2))),inset=c(.3,.02),xjust=0,cex=1,bty="n")
        if (es) dumbo<-bquote("Cable largado"== a + b %*% Prof)
        else dumbo<-bquote("Warp"== a + b %*% Depth)
        mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
-       mtext(paste0(round(c.inta*100),ifelse(es,"% Int. confianza/prediccion","% Confidence/prediction bands")),line=1.4,side=3,cex=.75,adj=1)
+       mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
        legend("topleft",legend=substitute(paste(Wrp.29VE == a + b %*% Dpth),list(a=round(coef(lm.WarpVsDepth.vde)[1],2),b=(round(coef(lm.WarpVsDepth.vde)[2],2)))),bty="n",text.font=2,inset=c(.01,.09),xjust=0)
        legend("topleft",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WarpVsDepth.vde)$adj.r.squared,2))),inset=c(.3,.09),xjust=0,cex=1,bty="n",col="red")
      }

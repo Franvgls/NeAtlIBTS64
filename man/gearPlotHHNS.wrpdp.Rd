@@ -11,6 +11,7 @@ gearPlotHHNS.wrpdp(
   country,
   line = T,
   c.inta = 0.85,
+  int.type = c("prediction", "confidence", "both"),
   col1 = "darkblue",
   getICES = T,
   pF = T
@@ -27,7 +28,9 @@ gearPlotHHNS.wrpdp(
 
 \item{line:}{includes a regression line between Warp and depth and the formula of the linear regression. If F the line is omited}
 
-\item{c.inta:}{the confidence interval to be used in the predict.lm function}
+\item{c.inta:}{the level (e.g. .95) of the band plotted, passed to \code{\link{gearBand}}}
+
+\item{int.type:}{"prediction" (default) plots the range where an individual haul is expected to fall, does not shrink with more data and is the appropriate choice for flagging hauls with an abnormal gear geometry; "confidence" plots the range for the mean curve, which shrinks as data accumulates; "both" plots both bands}
 
 \item{col1:}{the color of the points, last year fill and previous years empty symbol}
 
