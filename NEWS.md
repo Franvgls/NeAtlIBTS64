@@ -78,3 +78,16 @@
 * `GetAlkDTR.NeAtl64()`: new `plus` (terminal age group) and `n.ots`
   (return otolith counts instead of proportions) parameters; supports
   direct nesting with `GrafAlk.NeAtl64()`.
+
+# NeAtlIBTS64 0.1.4
+
+## Improvements
+
+* `qcHaulsDist()`: hauls with a missing shoot or haul position (empty
+  cell, `NA` or DATRAS `-9`) or a missing/invalid `TimeShot` are now
+  left out with a warning naming them (e.g. `ES-5 (HaulLat/HaulLong)`)
+  instead of stopping with "missing value where TRUE/FALSE needed".
+* `qcHaulsPosit()`: same warning for hauls with a missing position
+  (their track is not drawn); `-9` is now also converted to `NA` in
+  `ShootLat`/`ShootLong`, and the map extent ignores missing values and
+  includes haul-end positions.

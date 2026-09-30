@@ -36,10 +36,19 @@ qcHaulsPosit<-function(Survey="NS-IBTS",years,quarter,col1="red",ti=TRUE,Hpoints
   }
   quarter<-unique(dumb$Quarter)
   dumb<-dplyr::filter(dumb,HaulVal=="V")
-  for(i in 1:nrow(dumb)) {
-    if(dumb$HaulLat[i]==c(-9)) {dumb$HaulLat[i]<-NA}
-    if(dumb$HaulLong[i]==c(-9)) {dumb$HaulLong[i]<-NA}
-    }
+  # DATRAS -9 -> NA in positions; hauls with a missing shoot or haul
+  # position are warned about (their track cannot be drawn) instead of
+  # stopping the plot
+  pos_cols<-c("ShootLat","ShootLong","HaulLat","HaulLong")
+  for (col in pos_cols) {
+    dumb[[col]]<-suppressWarnings(as.numeric(dumb[[col]]))
+    dumb[[col]][!is.na(dumb[[col]]) & dumb[[col]]==c(-9)]<-NA
+  }
+  no_pos<-!stats::complete.cases(dumb[,pos_cols])
+  if (any(no_pos)) warning(paste0(sum(no_pos)," haul(s) with missing position, track not drawn: ",
+                                  posMissingLabel(dumb[no_pos,],pos_cols)),call.=FALSE)
+  if (all(is.na(dumb$ShootLong) & is.na(dumb$HaulLong)) | all(is.na(dumb$ShootLat) & is.na(dumb$HaulLat)))
+    stop("No hauls with positions to plot")
   countries<-unique(dumb$Country)
   #dumb<-dplyr::filter(dumb,Country==country)
   if (length(unique(dumb$Year))>1) stop("Only one year can be shown in this function")
@@ -52,8 +61,9 @@ qcHaulsPosit<-function(Survey="NS-IBTS",years,quarter,col1="red",ti=TRUE,Hpoints
   if (any(Survey=="SCOROC")) replong<-9
   if (any(! Survey %in% c("SP-PORC","SCOROC"))) replong<-.5
   ##
-  IBTSNeAtl_map64(load=F,NS=F,leg=F,newdev=FALSE,xlims = c(min(dumb$ShootLong)-.5,replong+max(dumb$ShootLong))
-                  ,ylims=c(min(dumb$ShootLat)-.5,.5+max(dumb$ShootLat)),places=T)
+  lons<-c(dumb$ShootLong,dumb$HaulLong); lats<-c(dumb$ShootLat,dumb$HaulLat)
+  IBTSNeAtl_map64(load=F,NS=F,leg=F,newdev=FALSE,xlims = c(min(lons,na.rm=TRUE)-.5,replong+max(lons,na.rm=TRUE))
+                  ,ylims=c(min(lats,na.rm=TRUE)-.5,.5+max(lats,na.rm=TRUE)),places=T)
   segments(dumb$ShootLong,dumb$ShootLat,dumb$HaulLong,dumb$HaulLat,col="red",lwd=2)
   if (Nhauls) text(dumb$ShootLong,dumb$ShootLat,labels = dumb$HaulNo,cex=.8)
   if (Hpoints) points(ShootLat~ShootLong,dumb,pch=21,cex=2,bg="blue")

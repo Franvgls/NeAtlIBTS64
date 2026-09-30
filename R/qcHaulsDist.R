@@ -80,6 +80,17 @@ qcHaulsDist <- function(Survey = "NS-IBTS", years, quarter,
     }
   }
 
+  # Hauls without complete shoot and haul positions cannot be checked:
+  # warn naming them and leave them out instead of stopping.
+  pos_cols <- c("ShootLat", "ShootLong", "HaulLat", "HaulLong")
+  no_pos <- !stats::complete.cases(dumb[, pos_cols])
+  if (any(no_pos)) {
+    warning(paste0(sum(no_pos), " haul(s) with missing position left out of the check: ",
+                   posMissingLabel(dumb[no_pos, ], pos_cols)), call. = FALSE)
+    dumb <- dumb[!no_pos, ]
+    if (nrow(dumb) == 0) stop("No valid hauls with complete positions to check")
+  }
+
   if (any(is.na(dumb$Distance))) {
     datafromNA <- dumb[is.na(dumb$Distance), ]
     has_pos <- !is.na(datafromNA$ShootLong) & !is.na(datafromNA$ShootLat) &
@@ -115,11 +126,12 @@ qcHaulsDist <- function(Survey = "NS-IBTS", years, quarter,
   dumb$error.rumb <- round(dumb$rumb - dumb$TowDir)
   dumb$date       <- as.Date(paste0(dumb$Year, "-", dumb$Month, "-", dumb$Day))
 
-  if (any(nchar(dumb$TimeShot) < 3)) {
-    message(paste("Some TimeShot are invalid, hauls",
-                  paste(dumb[nchar(dumb$TimeShot) < 3, ]$HaulNo, collapse = ", "),
-                  "will be ignored"))
-    dumb <- dumb[nchar(dumb$TimeShot) > 2, ]
+  bad_time <- is.na(dumb$TimeShot) | nchar(as.character(dumb$TimeShot)) < 3
+  if (any(bad_time)) {
+    warning(paste0(sum(bad_time), " haul(s) with missing or invalid TimeShot left out of the check: ",
+                   posMissingLabel(dumb[bad_time, ])), call. = FALSE)
+    dumb <- dumb[!bad_time, ]
+    if (nrow(dumb) == 0) stop("No valid hauls with a valid TimeShot to check")
   }
   dumb$quarter <- quarter
   dumb$time    <- ifelse(nchar(dumb$TimeShot) == 3,
