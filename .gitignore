@@ -6,3 +6,15 @@ data-raw
 .RData
 .httr-oauth
 .quarto
+
+# Imágenes de prueba en la raíz (se regeneran con las funciones; las de
+# manuales van en man/figures o vignettes)
+/*.png
+/*.jpg
+/*.jpeg
+/*.gif
+/*.bmp
+/*.tif
+/*.tiff
+/*.svg
+/Rplots.pdf
