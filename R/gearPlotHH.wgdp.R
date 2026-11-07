@@ -16,6 +16,8 @@
 #' @param pF: takes out the points and leaves only the lines in the graphs
 #' @param ti: if F title will not be included automatically and can be addedd later
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
+#'
+#' When several years are requested the model is fitted on all years but the last one, which is drawn on top as the year being checked. If a group (all hauls, or one sweep length) has fewer than 5 valid hauls before the last year, e.g. after a change of gear, its model is fitted with all its years instead and a message says so.
 #' @return Produces a graph with WingSpread vs. Depth. it also includes information on the ship, the time series used, the models and parameters estimated. The band level and int.type actually used are labelled on the plot: a single label when c.inta and c.intb match, or one label per curve, in that curve's color, when they differ.
 #' @examples
 #' \dontrun{
@@ -61,7 +63,8 @@ gearPlotHH.wgdp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("p
          if (length(levels(factor(dumb$sweeplngt)))<2) {
             dpthA<-range(dumb$Depth[dumb$Depth>0],na.rm=T)
             dp<-seq(dpthA[1],dpthA[2]+20,length=650)
-            if (length(years)>1) WingSpread.log<-nls(WingSpread~a1+b1*log(Depth),dumb,start=c(a1=.1,b1=1),subset=WingSpread!=c(-9) & WingSpread>0 & Year!=years[length(years)])
+            hist.all<-length(years)>1 && gearHasHist(dumb,years,"WingSpread","all hauls")
+            if (hist.all) WingSpread.log<-nls(WingSpread~a1+b1*log(Depth),dumb,start=c(a1=.1,b1=1),subset=WingSpread!=c(-9) & WingSpread>0 & Year!=years[length(years)])
             else WingSpread.log<-nls(WingSpread~a1+b1*log(Depth),dumb,start=c(a1=.1,b1=1),subset=WingSpread!=c(-9) & WingSpread>0)
             if (pF) {
               points(WingSpread~Depth,dumb,subset=Year==years[length(years)],pch=21,bg=col1)
@@ -81,7 +84,7 @@ gearPlotHH.wgdp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("p
               lines(dp,band$upr.conf,col=col1,lty=3,lwd=1)
             }
             legend("bottomright",legend=substitute(WS == a1 + b1 %*% log(depth),list(a1=round(coef(WingSpread.log)[1],2),b1=(round(coef(WingSpread.log)[2],2)))),bty="n",text.font=2,inset=.2)
-            mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+            mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
             dumbo<-bquote("Wing Spread"== a + b %*% log("Depth"))
             mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
             print(summary(WingSpread.log))
@@ -93,14 +96,12 @@ gearPlotHH.wgdp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("p
             dpthAlg<-range(dumblong$Depth,na.rm=T)
             dpst<-seq(dpthAst[1],dpthAst[2]+20,length=650)
             dplg<-seq(dpthAlg[1],dpthAlg[2]+20,length=650)
-            if (length(years)>1) {
-            WingSpreadst.log<-nls(WingSpread~a1+b1*log(Depth),dumbshort,start=c(a1=.1,b1=1),subset=WingSpread!=c(-9) & Year!=years[length(years)])
-            WingSpreadlg.log<-nls(WingSpread~a1+b1*log(Depth),dumblong,start=c(a1=.1,b1=1),subset=WingSpread!=c(-9) & Year!=years[length(years)])
-            }
-            else {
-              WingSpreadst.log<-nls(WingSpread~a1+b1*log(Depth),dumbshort,start=c(a1=.1,b1=1),subset=WingSpread!=c(-9))
-              WingSpreadlg.log<-nls(WingSpread~a1+b1*log(Depth),dumblong,start=c(a1=.1,b1=1),subset=WingSpread!=c(-9))
-            }
+            hist.st<-length(years)>1 && gearHasHist(dumbshort,years,"WingSpread",paste("sweep length",unique(dumbshort$SweepLngt)[1]))
+            hist.lg<-length(years)>1 && gearHasHist(dumblong,years,"WingSpread",paste("sweep length",unique(dumblong$SweepLngt)[1]))
+            if (hist.st) WingSpreadst.log<-nls(WingSpread~a1+b1*log(Depth),dumbshort,start=c(a1=.1,b1=1),subset=WingSpread!=c(-9) & Year!=years[length(years)])
+            else WingSpreadst.log<-nls(WingSpread~a1+b1*log(Depth),dumbshort,start=c(a1=.1,b1=1),subset=WingSpread!=c(-9))
+            if (hist.lg) WingSpreadlg.log<-nls(WingSpread~a1+b1*log(Depth),dumblong,start=c(a1=.1,b1=1),subset=WingSpread!=c(-9) & Year!=years[length(years)])
+            else WingSpreadlg.log<-nls(WingSpread~a1+b1*log(Depth),dumblong,start=c(a1=.1,b1=1),subset=WingSpread!=c(-9))
             if (pF) {
               points(WingSpread~Depth,dumbshort,subset=HaulVal=="V",pch=21,col=col2)
               points(WingSpread~Depth,dumblong,subset=HaulVal=="V",pch=21,col=col1)
@@ -138,9 +139,9 @@ gearPlotHH.wgdp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("p
             }
             legend("topright",legend=substitute(WSlong == a1lg + b1lg %*% log(depth),list(a1lg=round(coef(WingSpreadlg.log)[1],2),b1lg=(round(coef(WingSpreadlg.log)[2],2)))),bty="n",text.font=2,inset=.1)
             if (isTRUE(all.equal(c.inta,c.intb))) {
-              mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+              mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
             } else {
-              legend("bottomleft",legend=gearIntLabel(c.intb,int.type),text.col=col2,bty="n",text.font=2,cex=1,inset=c(.05,.02))
+              legend("bottomleft",legend=gearIntLabel(c.intb,int.type),text.col=col2,bty="n",text.font=2,cex=1,inset=c(.05,.18))
               legend("topright",legend=gearIntLabel(c.inta,int.type),text.col=col1,bty="n",text.font=2,cex=1,inset=c(.01,.2))
             }
             if(es) dumbo<-bquote("Abertura calones"== a + b %*% log("Prof"))

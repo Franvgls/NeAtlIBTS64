@@ -80,7 +80,7 @@ distHaversine function gives the haversine calculation of distance
 between two geographic points \code{\link[geosphere]{distHaversine}}
 }
 \seealso{
-Other quality control:
-\code{\link[=safe_getDATRAS]{safe_getDATRAS()}}
+Other quality control: 
+\code{\link{safe_getDATRAS}()}
 }
 \concept{quality control}

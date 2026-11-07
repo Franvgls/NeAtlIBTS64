@@ -54,6 +54,8 @@ If there are two different sweeps in the data, produces a model for each sweep l
 }
 \details{
 Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
+
+When several years are requested the model is fitted on all years but the last one, which is drawn on top as the year being checked. If a group (all hauls, or one sweep length) has fewer than 5 valid hauls before the last year, e.g. after a change of gear, its model is fitted with all its years instead and a message says so.
 }
 \examples{
 \dontrun{

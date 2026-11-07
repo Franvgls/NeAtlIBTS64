@@ -63,7 +63,7 @@ gearPlotHHNS.wrpdp<-function(Survey="NS-IBTS",years,quarter,country,line=T,c.int
        legend("topleft",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WarpVsDepth)$adj.r.squared,2))),inset=c(.2,.1),xjust=0.5,cex=.9,bty="n")
        dumbo<-bquote("Warp"== a + b %*% Depth)
        mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
-       mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+       mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
      }
      if (pF) {
         if (length(years)>1) {legend("bottomright",legend=c(paste("Hauls",years[length(years)]),"Previous hauls"),pch=c(21),col=c(1,col1),pt.bg=c(col1,NA),inset=.05,bty="n")}

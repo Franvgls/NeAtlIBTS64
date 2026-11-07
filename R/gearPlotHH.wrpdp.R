@@ -67,7 +67,7 @@ gearPlotHH.wrpdp<-function(Survey,years,quarter,incl2=TRUE,line=TRUE,c.inta=.95,
        if (es) dumbo<-bquote("Cable"== a + b %*% Prof)
        else dumbo<-bquote("Warp"== a + b %*% Depth)
        mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
-       mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+       mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
      }
      if (pF) {
       if (length(years)>1) {legend("bottomright",legend=c(paste(years[length(years)]),paste0(years[1],"-",years[length(years)-1])),pch=c(21),col=c(1,col1),pt.bg=c(col1,NA),inset=.05,bty="n")}

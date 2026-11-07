@@ -61,9 +61,9 @@ alk_n <- GetAlkDTR.NeAtl64("SP-NORTH", 2022, 4, 127145, n.ots = TRUE)
 \code{\link{GrafAlk.NeAtl64}}, \code{\link{SpeciesCAperYear}},
 \code{\link{AuditAlkCAMP_DATRAS}}
 
-Other ALK DATRAS:
-\code{\link[=AuditAlkCAMP_DATRAS]{AuditAlkCAMP_DATRAS()}},
-\code{\link[=GrafAlk.NeAtl64]{GrafAlk.NeAtl64()}},
-\code{\link[=TalAge.NeAtl64]{TalAge.NeAtl64()}}
+Other ALK DATRAS: 
+\code{\link{AuditAlkCAMP_DATRAS}()},
+\code{\link{GrafAlk.NeAtl64}()},
+\code{\link{TalAge.NeAtl64}()}
 }
 \concept{ALK DATRAS}

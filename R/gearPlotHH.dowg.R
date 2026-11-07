@@ -17,6 +17,8 @@
 #' @param pF: takes out the points and leaves only the lines in the graphs
 #' @param ti: if F title will not be included automatically and can be addedd later
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
+#'
+#' When several years are requested the model is fitted on all years but the last one, which is drawn on top as the year being checked. If a group (all hauls, or one sweep length) has fewer than 5 valid hauls before the last year, e.g. after a change of gear, its model is fitted with all its years instead and a message says so.
 #' @return Produces a graph with WingSpread vs. DoorSpread, it also includes information on the ship, the time series used, the models and parameters estimated.
 #' @examples
 #' \dontrun{
@@ -59,7 +61,8 @@ gearPlotHH.dowg<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,int.
      wspr<-range(subset(dumb$WingSpread,dumb$WingSpread> c(0)))
      dspr<-range(subset(dumb$DoorSpread,dumb$DoorSpread>c(0)))
      if (length(levels(factor(dumb$SweepLngt)))<2) {
-            if (length(years)>1) lm.DoorVsWing<-lm(DoorSpread~WingSpread,dumb,subset=c(HaulVal=="V" & WingSpread>0 & DoorSpread>0 & Year!=years[length(years)]))
+            hist.all<-length(years)>1 && gearHasHist(dumb,years,c("WingSpread","DoorSpread"),"all hauls")
+            if (hist.all) lm.DoorVsWing<-lm(DoorSpread~WingSpread,dumb,subset=c(HaulVal=="V" & WingSpread>0 & DoorSpread>0 & Year!=years[length(years)]))
             else lm.DoorVsWing<-lm(DoorSpread~WingSpread,dumb,subset=c(HaulVal=="V" & WingSpread>0 & DoorSpread>0))
                         #outlierTest(lm.DoorVsWing,data=dumb)
             ws<-data.frame(WingSpread=seq(wspr[1],wspr[2],length.out = 10))
@@ -90,17 +93,15 @@ gearPlotHH.dowg<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,int.
             legend("bottomright",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.DoorVsWing)$adj.r.squared,2))),inset=c(.25,.15),cex=.9,bty="n")
             dumbo<-bquote("DS"== a + b %*% WS)
             mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
-            mtext(gearIntLabel(c.int,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+            mtext(gearIntLabel(c.int,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
             }
          if (length(levels(factor(dumb$SweepLngt)))==2) {
-           if (length(years)>1) {
-            lm.DoorVsWing.short<-lm(DoorSpread~WingSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[1] & c(StNo!="FG1"&Year!=2015) & Year!= years[length(years)])
-            lm.DoorVsWing.long<-lm(DoorSpread~WingSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[2] & Year!= years[length(years)])
-           }
-           else {
-             lm.DoorVsWing.short<-lm(DoorSpread~WingSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[1] & c(StNo!="FG1"& Year!=2015) )
-             lm.DoorVsWing.long<-lm(DoorSpread~WingSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[2])
-           }
+           hist.st<-length(years)>1 && gearHasHist(dumb[dumb$SweepLngt==levels(factor(dumb$SweepLngt))[1],],years,c("WingSpread","DoorSpread"),"the short sweeps")
+           hist.lg<-length(years)>1 && gearHasHist(dumb[dumb$SweepLngt==levels(factor(dumb$SweepLngt))[2],],years,c("WingSpread","DoorSpread"),"the long sweeps")
+           if (hist.st) lm.DoorVsWing.short<-lm(DoorSpread~WingSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[1] & c(StNo!="FG1"&Year!=2015) & Year!= years[length(years)])
+           else lm.DoorVsWing.short<-lm(DoorSpread~WingSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[1] & c(StNo!="FG1"& Year!=2015) )
+           if (hist.lg) lm.DoorVsWing.long<-lm(DoorSpread~WingSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[2] & Year!= years[length(years)])
+           else lm.DoorVsWing.long<-lm(DoorSpread~WingSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[2])
             plot(DoorSpread~WingSpread,dumb,type="n",subset=HaulVal=="V" & Year!=years[length(years)],xlim=c(wspr[1]-10,wspr[2]+10),ylim=c(dspr[1]-20,dspr[2]+20),xlab=ifelse(es,"Abertura Calones (m)","Wing Spread (m)"),ylab=ifelse(es,"Abertura puertas (m)","Door Spread (m)"),pch=21,col="grey")
             if (ti) title(main=paste0(ifelse(es,"Abertura puertas vs. Abertura calones en ","Door spread vs. wing spread in "),dumb$Survey[1],".Q",quarter),line=2.5)
             mtext(dumb$Ship[1],line=.4,cex=.8,adj=0)
@@ -148,7 +149,7 @@ gearPlotHH.dowg<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,int.
             dumbo<-bquote("WS"== a + b %*% DS)
             mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
             if (isTRUE(all.equal(c.inta,c.intb))) {
-              mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+              mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
             } else {
               legend("topleft",legend=gearIntLabel(c.inta,int.type),text.col=col2,bty="n",text.font=2,cex=1,inset=c(.01,.02))
               legend("topleft",legend=gearIntLabel(c.intb,int.type),text.col=col1,bty="n",text.font=2,cex=1,inset=c(.01,.09))

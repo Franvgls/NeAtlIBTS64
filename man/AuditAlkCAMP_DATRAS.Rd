@@ -69,9 +69,9 @@ write.csv(audit, "auditoria_boscii_N22.csv", row.names=FALSE)
 \seealso{
 \code{\link{GetAlkDTR.NeAtl64}}, \code{\link{GrafAlk.NeAtl64}}
 
-Other ALK DATRAS:
-\code{\link[=GetAlkDTR.NeAtl64]{GetAlkDTR.NeAtl64()}},
-\code{\link[=GrafAlk.NeAtl64]{GrafAlk.NeAtl64()}},
-\code{\link[=TalAge.NeAtl64]{TalAge.NeAtl64()}}
+Other ALK DATRAS: 
+\code{\link{GetAlkDTR.NeAtl64}()},
+\code{\link{GrafAlk.NeAtl64}()},
+\code{\link{TalAge.NeAtl64}()}
 }
 \concept{ALK DATRAS}

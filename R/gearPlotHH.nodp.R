@@ -17,6 +17,8 @@
 #' @param pF: takes out the points and leaves only the lines in the graphs
 #' @param ti: if F title will not be included automatically and can be addedd later
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
+#'
+#' When several years are requested the model is fitted on all years but the last one, which is drawn on top as the year being checked. If a group (all hauls, or one sweep length) has fewer than 5 valid hauls before the last year, e.g. after a change of gear, its model is fitted with all its years instead and a message says so.
 #' @return Produces Net Vertical opening vs. Depth plot it also includes information on the ship, the time series used (bottom fourth graph), the models and parameters estimated. The band level and int.type actually used are labelled on the plot: a single label when c.inta and c.intb match, or one label per curve, in that curve's color, when they differ.
 #' @examples
 #' \dontrun{
@@ -51,7 +53,8 @@ gearPlotHH.nodp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("p
           if (pF) points(Netopening~Depth,dumb,pch=21,col=col1,subset=Year!=years[length(years)] & Netopening> c(-9))
           if (length(levels(dumb$sweeplngt))<2) {
             dp<-seq(dpthA[1],dpthA[2]+20,length=650)
-            if (length(years)>1) {Netopening.log<-nls(Netopening~a1+b1*log(Depth),dumb,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(0) & Year!= years[length(years)])}
+            hist.all<-length(years)>1 && gearHasHist(dumb,years,"Netopening","all hauls")
+            if (hist.all) {Netopening.log<-nls(Netopening~a1+b1*log(Depth),dumb,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(0) & Year!= years[length(years)])}
             else {Netopening.log<-nls(Netopening~a1+b1*log(Depth),dumb,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(0))}
             if (ti) title(main=paste0(ifelse(es,"Abertura vertical vs. profundidad en ","Vertical opening vs. Depth in "),dumb$Survey[1],".Q",quarter," survey"),line=2.5)
             mtext(dumb$Ship[length(dumb$Ship)],line=.4,cex=.9,adj=0)
@@ -71,7 +74,7 @@ gearPlotHH.nodp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("p
               else legend("bottomright",as.character(years),pch=21,col=col1,pt.bg=col1,bty="n",inset=.02)
               }
             legend("topright",legend=substitute(NetOpening == a1 + b1 %*% log(depth),list(a1=round(coef(Netopening.log)[1],2),b1=(round(coef(Netopening.log)[2],2)))),bty="n",text.font=2,inset=.05)
-            mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+            mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
             if (es) dumbo<-bquote("Net vert. opening"== a + b %*% log())
             else dumbo<-bquote("Abertura vertical red"== a + b %*% log("Prof"))
             summary(Netopening.log)
@@ -83,14 +86,12 @@ gearPlotHH.nodp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("p
            dpthAlg<-range(dumblong$Depth,na.rm=T)
            dpst<-seq(dpthAst[1],dpthAst[2]+20,length=650)
            dplg<-seq(dpthAlg[1],dpthAlg[2]+20,length=650)
-           if (length(years)>1) {
-              Netopeningst.log<-nls(Netopening~a1+b1*log(Depth),dumbshort,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(-9) & Year!=years[length(years)])  # se puede utilizar alg="plinear" para cuando no hay muestra suficiente para calcular los valores iniciales
-              Netopeninglg.log<-nls(Netopening~a1+b1*log(Depth),dumblong,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(-9) & Year!=years[length(years)])
-           }
-           else {
-              Netopeningst.log<-nls(Netopening~a1+b1*log(Depth),dumbshort,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(-9))  # se puede utilizar alg="plinear" para cuando no hay muestra suficiente para calcular los valores iniciales
-              Netopeninglg.log<-nls(Netopening~a1+b1*log(Depth),dumblong,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(-9))
-              }
+           hist.st<-length(years)>1 && gearHasHist(dumbshort,years,"Netopening",paste("sweep length",unique(dumbshort$SweepLngt)[1]))
+           hist.lg<-length(years)>1 && gearHasHist(dumblong,years,"Netopening",paste("sweep length",unique(dumblong$SweepLngt)[1]))
+           if (hist.st) Netopeningst.log<-nls(Netopening~a1+b1*log(Depth),dumbshort,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(-9) & Year!=years[length(years)])  # se puede utilizar alg="plinear" para cuando no hay muestra suficiente para calcular los valores iniciales
+           else Netopeningst.log<-nls(Netopening~a1+b1*log(Depth),dumbshort,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(-9))
+           if (hist.lg) Netopeninglg.log<-nls(Netopening~a1+b1*log(Depth),dumblong,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(-9) & Year!=years[length(years)])
+           else Netopeninglg.log<-nls(Netopening~a1+b1*log(Depth),dumblong,start=c(a1=.1,b1=1),subset=HaulVal=="V" & Netopening> c(-9))
            vrtst<-range(subset(dumbshort$Netopening,dumbshort$Netopening> c(-9)))
            vrtlg<-range(subset(dumblong$Netopening,dumblong$Netopening> c(-9)))
            if (pF) {
@@ -130,7 +131,7 @@ gearPlotHH.nodp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("p
            }
            legend("topright",legend=substitute(LongVop == a1lg + b1lg %*% log(depth),list(a1lg=round(coef(Netopeninglg.log)[1],2),b1lg=(round(coef(Netopeninglg.log)[2],2)))),bty="n",text.font=2,inset=.2)
            if (isTRUE(all.equal(c.inta,c.intb))) {
-             mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+             mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
            } else {
              legend("topleft",legend=gearIntLabel(c.inta,int.type),text.col=col2,bty="n",text.font=2,cex=1,inset=c(.05,.15))
              legend("topright",legend=gearIntLabel(c.intb,int.type),text.col=col1,bty="n",text.font=2,cex=1,inset=c(.2,.3))

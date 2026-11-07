@@ -81,7 +81,7 @@ gearPlotHHN21.wrpdp<-function(Survey="SP-NORTH",years=2021,quarter=4,incl2=TRUE,
        if (es) dumbo<-bquote("Cable largado"== a + b %*% Prof)
        else dumbo<-bquote("Warp"== a + b %*% Depth)
        mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
-       mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+       mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
        legend("topleft",legend=substitute(paste(Wrp.29VE == a + b %*% Dpth),list(a=round(coef(lm.WarpVsDepth.vde)[1],2),b=(round(coef(lm.WarpVsDepth.vde)[2],2)))),bty="n",text.font=2,inset=c(.01,.09),xjust=0)
        legend("topleft",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WarpVsDepth.vde)$adj.r.squared,2))),inset=c(.3,.09),xjust=0,cex=1,bty="n",col="red")
      }

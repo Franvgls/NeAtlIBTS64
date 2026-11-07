@@ -17,6 +17,8 @@
 #' @param pF: takes out the points and leaves only the lines in the graphs
 #' @param ti: if F title will not be included automatically and can be addedd later
 #' @details Surveys available in DATRAS: i.e. SWC-IBTS, ROCKALL, NIGFS, IE-IGFS, SP-PORC, FR-CGFS, EVHOE, SP-NORTH, PT-IBTS and SP-ARSA
+#'
+#' When several years are requested the model is fitted on all years but the last one, which is drawn on top as the year being checked. If a group (all hauls, or one sweep length) has fewer than 5 valid hauls before the last year, e.g. after a change of gear, its model is fitted with all its years instead and a message says so.
 #' @return Produces a graph with DoorSpread vs. WingSpread, it also includes information on the ship, the time series used, the models and parameters estimated. The band level and int.type actually used are labelled on the plot: a single label when c.inta and c.intb match, or one label per curve, in that curve's color, when they differ.
 #' @examples
 #' \dontrun{
@@ -50,7 +52,8 @@ gearPlotHH.wgdo<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,int.
      wspr<-range(subset(dumb$WingSpread,dumb$WingSpread> c(0)))
      dspr<-range(subset(dumb$DoorSpread,dumb$DoorSpread>c(0)))
      if (length(unique(dumb$SweepLngt))<2) {
-            if (length(years)>1) lm.WingVsDoor<-lm(WingSpread~DoorSpread,dumb,subset=c(HaulVal=="V" & WingSpread>0 & DoorSpread>0 & Year!=years[length(years)]))
+            hist.all<-length(years)>1 && gearHasHist(dumb,years,c("WingSpread","DoorSpread"),"all hauls")
+            if (hist.all) lm.WingVsDoor<-lm(WingSpread~DoorSpread,dumb,subset=c(HaulVal=="V" & WingSpread>0 & DoorSpread>0 & Year!=years[length(years)]))
             else lm.WingVsDoor<-lm(WingSpread~DoorSpread,dumb,subset=c(HaulVal=="V" & WingSpread>0 & DoorSpread>0))
                         #outlierTest(lm.WingVsDoor,data=dumb)
             ds<-data.frame(DoorSpread=seq(dspr[1],dspr[2],length.out = 10))
@@ -76,19 +79,17 @@ gearPlotHH.wgdo<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,int.
             #abline(lm.WingVsDoor,col=2,lty=2)
             legend("bottomright",legend=substitute(paste(WS == a + b %*% DS),list(a=round(coef(lm.WingVsDoor)[1],2),b=(round(coef(lm.WingVsDoor)[2],2)))),bty="n",text.font=2,inset=.2)
             legend("bottomright",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WingVsDoor)$adj.r.squared,2))),inset=c(.25,.15),cex=.9,bty="n")
-            mtext(gearIntLabel(c.int,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+            mtext(gearIntLabel(c.int,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
             dumbo<-bquote("WS"== a + b %*% DS)
             mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
             }
          if (length(levels(factor(dumb$SweepLngt)))==2) {
-           if (length(years)>1) {
-            lm.WingVsDoor.short<-lm(WingSpread~DoorSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[1] & c(StNo!="FG1"&Year!=2015) & Year!= years[length(years)])
-            lm.WingVsDoor.long<-lm(WingSpread~DoorSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[2] & Year!= years[length(years)])
-           }
-           else {
-             lm.WingVsDoor.short<-lm(WingSpread~DoorSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[1] & c(StNo!="FG1"& Year!=2015) )
-             lm.WingVsDoor.long<-lm(WingSpread~DoorSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[2])
-           }
+           hist.st<-length(years)>1 && gearHasHist(dumb[dumb$SweepLngt==levels(factor(dumb$SweepLngt))[1],],years,c("WingSpread","DoorSpread"),"the short sweeps")
+           hist.lg<-length(years)>1 && gearHasHist(dumb[dumb$SweepLngt==levels(factor(dumb$SweepLngt))[2],],years,c("WingSpread","DoorSpread"),"the long sweeps")
+           if (hist.st) lm.WingVsDoor.short<-lm(WingSpread~DoorSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[1] & c(StNo!="FG1"&Year!=2015) & Year!= years[length(years)])
+           else lm.WingVsDoor.short<-lm(WingSpread~DoorSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[1] & c(StNo!="FG1"& Year!=2015) )
+           if (hist.lg) lm.WingVsDoor.long<-lm(WingSpread~DoorSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[2] & Year!= years[length(years)])
+           else lm.WingVsDoor.long<-lm(WingSpread~DoorSpread,dumb,subset=HaulVal=="V" & WingSpread > c(-9) & DoorSpread> c(-9) & SweepLngt==levels(factor(SweepLngt))[2])
             plot(WingSpread~DoorSpread,dumb,type="n",subset=HaulVal=="V" & Year!=years[length(years)],xlim=c(dspr[1]-20,dspr[2]+20),ylim=c(wspr[1]-10,wspr[2]+10),xlab=ifelse(es,"Abertura puertas (m)","Door Spread (m)"),ylab=ifelse(es,"Abertura calones (m)","Wing Spread (m)"),pch=21,col="grey")
             #title(main=paste0(ifelse(es,"Abertura de calones vs. Abertura de puertas","Wing Spread vs. door spread in "),dumb$Survey[1],".Q",quarter),line=2.5)
             if (ti) title(main=paste0(ifelse(es,"Abertura de calones vs. Abertura de puertas","Wing Spread vs. door spread in "),dumb$Survey[1],".Q",quarter),line=2.5)
@@ -131,7 +132,7 @@ gearPlotHH.wgdo<-function(Survey,years,quarter,c.int=.9,c.inta=.8,c.intb=.8,int.
             legend("topright",legend=substitute(paste(WSlong == a + b %*% DSlong),list(a=round(coef(lm.WingVsDoor.long)[1],2),b=(round(coef(lm.WingVsDoor.long)[2],2)))),bty="n",text.font=2,inset=.05,text.col=col1)
             legend("topright",legend=substitute(paste(r^2 ==resq),list(resq=round(summary(lm.WingVsDoor.long)$adj.r.squared,2))),inset=c(.15,.12),cex=.9,bty="n",text.col=col1)
             if (isTRUE(all.equal(c.inta,c.intb))) {
-              mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+              mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
             } else {
               legend("bottomleft",legend=gearIntLabel(c.inta,int.type),text.col=col2,bty="n",text.font=2,cex=1,inset=c(.09,.18))
               legend("topright",legend=gearIntLabel(c.intb,int.type),text.col=col1,bty="n",text.font=2,cex=1,inset=c(.05,.2))

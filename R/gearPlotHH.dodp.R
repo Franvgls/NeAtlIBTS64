@@ -61,7 +61,7 @@ gearPlotHH.dodp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("p
            lines(dp,band$upr.conf,col=col1,lty=3,lwd=1)
          }
          legend("bottomright",legend=substitute(DS == a1 + b1 %*% log(depth),list(a1=round(coef(DoorSpread.log)[1],2),b1=(round(coef(DoorSpread.log)[2],2)))),bty="n",text.font=2,inset=.2)
-         mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+         mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
          #         text("bottomleft",paste0(c(years[1],"-",years[length(years)])),inset=c(0,.1))
          if (es){
            dumbo<-bquote("Abertura puertas"== a + b %*% log("prof"))
@@ -119,7 +119,7 @@ gearPlotHH.dodp<-function(Survey,years,quarter,c.inta=.8,c.intb=.3,int.type=c("p
             }
             legend("topright",legend=substitute(DSlong == a1lg + b1lg %*% log(depth),list(a1lg=round(coef(DoorSpreadlg.log)[1],2),b1lg=(round(coef(DoorSpreadlg.log)[2],2)))),bty="n",text.font=2,cex=.9,inset=c(.01,.4))
             if (isTRUE(all.equal(c.inta,c.intb))) {
-              mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+              mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
             } else {
               legend("bottomleft",legend=gearIntLabel(c.intb,int.type),text.col=col2,bty="n",text.font=2,cex=1,inset=c(.05,.08))
               legend("topright",legend=gearIntLabel(c.inta,int.type),text.col=col1,bty="n",text.font=2,cex=1,inset=c(.01,.55))

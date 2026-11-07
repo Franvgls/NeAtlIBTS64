@@ -36,7 +36,7 @@ Espana ni de un unico equipo.)}
 \item{aphia}{SpecCode/Valid_Aphia de la especie, ej. 127146.}
 
 \item{maturity}{Logico. TRUE (por defecto): separa por \code{Maturity >
-61} (maduros/inmaduros) con \code{groups=} y \code{auto.key}. FALSE:
+  61} (maduros/inmaduros) con \code{groups=} y \code{auto.key}. FALSE:
 un solo grupo, sin distincion de madurez.}
 
 \item{by_cm}{Logico. TRUE (por defecto): representa la talla en cm
@@ -45,7 +45,7 @@ enteros (\code{trunc(LngtClass/10)}), \code{ylab} = "Length class
 = "Length class (mm)" (como en el script exploratorio original).}
 
 \item{maxlength}{Talla maxima a representar (subset \code{Lngt <
-maxlength}), en las mismas unidades que marque \code{by_cm} (cm si
+  maxlength}), en las mismas unidades que marque \code{by_cm} (cm si
 TRUE, mm si FALSE). NULL (por defecto) = sin filtro.}
 
 \item{data}{data.frame ya construido (p.ej. tu \code{ldbCAs}, el CSV ya
@@ -138,9 +138,9 @@ TalAge.NeAtl64(years = 1996:2022, aphia = 127145, data = ldbCAs,
 \seealso{
 \code{\link{GetAlkDTR.NeAtl64}}, \code{\link{GrafAlk.NeAtl64}}
 
-Other ALK DATRAS:
-\code{\link[=AuditAlkCAMP_DATRAS]{AuditAlkCAMP_DATRAS()}},
-\code{\link[=GetAlkDTR.NeAtl64]{GetAlkDTR.NeAtl64()}},
-\code{\link[=GrafAlk.NeAtl64]{GrafAlk.NeAtl64()}}
+Other ALK DATRAS: 
+\code{\link{AuditAlkCAMP_DATRAS}()},
+\code{\link{GetAlkDTR.NeAtl64}()},
+\code{\link{GrafAlk.NeAtl64}()}
 }
 \concept{ALK DATRAS}

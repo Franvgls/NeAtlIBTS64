@@ -68,9 +68,9 @@ GrafAlk.NeAtl64(alk, es = FALSE, ti = "L. boscii SP-N 2022 Q4")
 \seealso{
 \code{\link{GetAlkDTR.NeAtl64}}
 
-Other ALK DATRAS:
-\code{\link[=AuditAlkCAMP_DATRAS]{AuditAlkCAMP_DATRAS()}},
-\code{\link[=GetAlkDTR.NeAtl64]{GetAlkDTR.NeAtl64()}},
-\code{\link[=TalAge.NeAtl64]{TalAge.NeAtl64()}}
+Other ALK DATRAS: 
+\code{\link{AuditAlkCAMP_DATRAS}()},
+\code{\link{GetAlkDTR.NeAtl64}()},
+\code{\link{TalAge.NeAtl64}()}
 }
 \concept{ALK DATRAS}

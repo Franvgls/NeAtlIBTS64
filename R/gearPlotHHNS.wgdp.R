@@ -70,7 +70,7 @@ gearPlotHHNS.wgdp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
               lines(dp,band$upr.conf,col=col1,lty=3,lwd=1)
             }
             legend("bottomright",legend=substitute(WS == a1 + b1 %*% log(depth),list(a1=round(coef(WingSpread.log)[1],2),b1=(round(coef(WingSpread.log)[2],2)))),bty="n",text.font=2,inset=.2)
-            mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+            mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
             dumbo<-bquote("Wing Spread"== a + b %*% log("Depth"))
             mtext(dumbo,line=.4,side=3,cex=.8,font=2,adj=1)
             print(summary(WingSpread.log))
@@ -111,9 +111,9 @@ gearPlotHHNS.wgdp<-function(Survey="NS-IBTS",years,quarter,country,c.inta=.8,c.i
             }
             legend("topright",legend=substitute(WSlong == a1lg + b1lg %*% log(depth),list(a1lg=round(coef(WingSpreadlg.log)[1],2),b1lg=(round(coef(WingSpreadlg.log)[2],2)))),bty="n",text.font=2,inset=.1)
             if (isTRUE(all.equal(c.inta,c.intb))) {
-              mtext(gearIntLabel(c.inta,int.type),side=1,line=-1.1,adj=.99,cex=1,font=2)
+              mtext(gearIntLabel(c.inta,int.type),side=3,line=.4,adj=.5,cex=1,font=2)
             } else {
-              legend("bottomleft",legend=gearIntLabel(c.intb,int.type),text.col=col2,bty="n",text.font=2,cex=1,inset=c(.05,.02))
+              legend("bottomleft",legend=gearIntLabel(c.intb,int.type),text.col=col2,bty="n",text.font=2,cex=1,inset=c(.05,.18))
               legend("topright",legend=gearIntLabel(c.inta,int.type),text.col=col1,bty="n",text.font=2,cex=1,inset=c(.01,.2))
             }
             dumbo<-bquote("Wing Spread"== a + b %*% log("Depth"))
